@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% load static %} {% block title %} Status {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <!-- Card Profile -->
+
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>Status</span></h2>
+      </div>
+
+      {% if user.role == "Super Admin" or user.role == "Admin" %}
+      <div class="col-sm-4 text-right">
+        <a class="btn btn-primary btn-pill" href="/status/create" role="button">
+          Add Status
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-default">
+          <div class="card-body">
+            <table
+              id="productsTable"
+              class="table table-striped table-product"
+              style="width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Status Name</th>
+                  <th>Created At</th>
+                  <th>Edit/Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in status %}
+                <tr>
+                  <td class="py-0">{{ forloop.counter }}</td>
+                  <td>{{ p.name }}</td>
+                  <td>{{ p.created_at }}</td>
+                  <td>
+                    {% if user.role == "Super Admin" or user.role == "Admin" %}
+                    <a
+                      href="/status/{{ p.name }}/update"
+                      class="btn btn-warning iconbtn"
+                      ><i class="mdi mdi-account-edit"></i
+                    ></a>
+                    <a
+                      href="/status/{{ p.name }}/delete"
+                      class="btn btn-danger iconbtn"
+                      ><i class="mdi mdi-delete"></i
+                    ></a>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

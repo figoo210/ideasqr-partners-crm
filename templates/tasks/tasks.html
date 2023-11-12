@@ -1,0 +1,123 @@
+{% extends "base.html" %} {% load static %} {% block title %} Tasks {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <!-- Card Profile -->
+
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>Tasks</span></h2>
+      </div>
+      {% if user.role == "Super Admin" or user.role == "Admin" or user.role == "Team Leader" %}
+      <div class="col-sm-4 text-right">
+        <a class="btn btn-primary btn-pill" href="/add-task" role="button">
+          Add task
+        </a>
+      </div>
+      {% endif %}
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-default">
+          <div class="card-body">
+            <table
+              id="tasksTable"
+              class="table table-hover table-product"
+              style="width: 100%"
+            >
+              <thead>
+                <tr class="text-center">
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Task Name</th>
+                  <th>Task description</th>
+                  <th>Assigned</th>
+                  <th>Status</th>
+                  <th>Edit/Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                {% for task in tasks %}
+                  {% if task.to_user == user or task.from_user == user %}
+                    <tr>
+                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ forloop.counter }}</div></td>
+                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.due_date }}</div></td>
+                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.name }}</div></td>
+                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.description }}</div></td>
+                      <td class="p-0" style="height: 80px;">
+                        <div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                          {% if task.to_user == user %}From: {{ task.from_user }}{% else %}To: {{ task.to_user }}{% endif %}
+                        </div>
+                      </td>
+                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                        <select class="form-control" id="taskStates-{{ forloop.counter }}">
+                          <option></option>
+                          <option
+                            value="todo"
+                            data-url="/task/state/{{task.id}}/todo"
+                            {% if task.state == "todo" %}
+                              selected
+                            {% endif %}
+                          >
+                            To Do
+                          </option>
+
+                          <option
+                            value="in_progress"
+                            data-url="/task/state/{{task.id}}/in_progress"
+                            {% if task.state == "in_progress" %}
+                              selected
+                            {% endif %}
+                          >
+                            In Progress
+                          </option>
+
+                          <option
+                            value="done"
+                            data-url="/task/state/{{task.id}}/done"
+                            {% if task.state == "done" %}
+                              selected
+                            {% endif %}
+                          >
+                            Done
+                          </option>
+
+                        </select>
+                      </div>
+                      </td>
+                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                        {% if user.role == "Super Admin" or user.role == "Admin" or user.role == "Team Leader" %}
+                        <a href="/tasks/{{ task.id }}/edit/" class="btn btn-warning iconbtn"><i class="mdi mdi-account-edit"></i></a>
+                        <a href="/tasks/{{ task.id }}/delete/" class="btn btn-danger iconbtn"><i class="mdi mdi-delete"></i></a>
+                        {% endif %}
+                        </div>
+                      </td>
+                    </tr>
+                  {% endif %}
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const taskStates = document.querySelectorAll('[id^="taskStates-"]');
+  for (let q = 0; q < taskStates.length; q++) {
+    let taskState = taskStates[q];
+    taskState.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      if (selectedOption.value && selectedOption.getAttribute('data-url')) {
+        const url = selectedOption.getAttribute('data-url');
+        window.location.href = url;
+      }
+    });
+  }
+
+</script>
+{% endblock content %}

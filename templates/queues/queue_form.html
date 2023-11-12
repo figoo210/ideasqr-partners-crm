@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% load static %} {% block title %} Queue {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>Queue</span></h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-12">
+        <!-- Form Square -->
+        <div class="card card-default">
+          <div class="card-header"></div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="exampleFormControlInput44">Queue Name</label>
+                {{ form.name }}
+              </div>
+
+              <div class="form-group">
+                <label for="exampleFormControlPasswor3">Queue Description</label>
+                {{ form.description }}
+              </div>
+
+              <div class="form-footer text-right">
+                <button type="submit" class="btn btn-secondary btn-pill">
+                  Submit
+                </button>
+              </div>
+            </form>
+            <a href="/queues">Back to Queues List</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

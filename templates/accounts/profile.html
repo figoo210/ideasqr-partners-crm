@@ -1,0 +1,204 @@
+{% extends "base.html" %} {% load static %} {% block title %} Profile {% endblock title %} {% block content %}
+
+
+<div class="content-wrapper">
+  <div class="content">
+    <!-- Card Profile -->
+    <div class="card card-default card-profile">
+      <div class="card-header-bg"></div>
+
+      <div class="card-body card-profile-body">
+        <div class="profile-avata">
+          <img
+            class="rounded-circle"
+            {% if user.image %}
+            src="{{ user.image.url }}"
+            {% else %}
+            src="{% static 'images/user/user-md-01.jpg' %}"
+            {% endif %}
+            alt="Avatar Image"
+          />
+          <span class="h5 d-block mt-3 mb-2">{{ user.username }}</span>
+          <span class="d-block">{{ user.email }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer card-profile-footer">
+        <ul class="nav nav-border-top justify-content-center">
+          <li class="nav-item">
+            <a class="nav-link active" href="/profile">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/account">Account setting</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-default">
+          <div class="d-flex p-5">
+            <div class="icon-md bg-secondary rounded-circle mr-3">
+              <i class="mdi mdi-account-plus-outline"></i>
+            </div>
+            <div class="text-left">
+              <span class="h2 d-block">{{ states.new_clients }}</span>
+              <p>New Clients</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-default">
+          <div class="d-flex p-5">
+            <div class="icon-md bg-success rounded-circle mr-3">
+              <i class="mdi mdi-table-edit"></i>
+            </div>
+            <div class="text-left">
+              <span class="h2 d-block">{{ states.active_user }}</span>
+              <p>Active user</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-default">
+          <div class="d-flex p-5">
+            <div class="icon-md bg-primary rounded-circle mr-3">
+              <i class="mdi mdi-content-save-edit-outline"></i>
+            </div>
+            <div class="text-left">
+              <span class="h2 d-block">{{ states.inactive_user }}</span>
+              <p>Inactive user</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6">
+        <div class="card card-default">
+          <div class="d-flex p-5">
+            <div class="icon-md bg-info rounded-circle mr-3">
+              <i class="mdi mdi-account-group"></i>
+            </div>
+            <div class="text-left">
+              <span class="h2 d-block">{{ states.members }}</span>
+              <p>Members</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-3">
+        <!-- Settings -->
+        <div class="card card-default">
+          <div class="card-header">
+            <h2>Details</h2>
+          </div>
+
+          <div class="card-body pt-0">
+            <ul class="nav nav-settings">
+              <li class="nav-item">
+                <a class="nav-link active" href="/profile">
+                  <i class="mdi mdi-account-outline mr-1"></i> Profile
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/account">
+                  <i class="mdi mdi-settings-outline mr-1"></i> Account
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <!-- To Do list -->
+        <div class="card card-default pb-4" id="todo">
+          <div class="card-header mb-3">
+            <h2>To Do list</h2>
+          </div>
+
+          <div class="card-body" data-simplebar style="height: 385px">
+            <div class="todo-single-item d-none" id="todo-input">
+              <form>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter Todo"
+                    autofocus
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="todo-list" id="todo-list">
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between finished"
+              >
+                <i class="mdi"></i>
+                <span>Finish Dashboard UI Kit update</span>
+                <span class="badge badge-primary">Finished</span>
+              </div>
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between current"
+              >
+                <i class="mdi"></i>
+                <span>Create new prototype for the landing page</span>
+                <span class="badge badge-primary">Today</span>
+              </div>
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between"
+              >
+                <i class="mdi"></i>
+                <span> Add new Google Analytics code to all main files </span>
+                <span class="badge badge-danger">Yesterday</span>
+              </div>
+
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between"
+              >
+                <i class="mdi"></i>
+                <span>Update parallax scroll on team page</span>
+                <span class="badge badge-success">Dec 15, 2018</span>
+              </div>
+
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between"
+              >
+                <i class="mdi"></i>
+                <span>Update parallax scroll on team page</span>
+                <span class="badge badge-success">Dec 15, 2018</span>
+              </div>
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between"
+              >
+                <i class="mdi"></i>
+                <span>Create online customer list book</span>
+                <span class="badge badge-success">Dec 15, 2018</span>
+              </div>
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between"
+              >
+                <i class="mdi"></i>
+                <span>Lorem ipsum dolor sit amet, consectetur.</span>
+                <span class="badge badge-success">Dec 15, 2018</span>
+              </div>
+
+              <div
+                class="todo-single-item d-flex flex-row justify-content-between mb-1"
+              >
+                <i class="mdi"></i>
+                <span>Update parallax scroll on team page</span>
+                <span class="badge badge-success">Dec 15, 2018</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

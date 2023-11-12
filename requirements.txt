@@ -1,0 +1,5 @@
+python-dotenv
+mysqlclient
+Django
+Pillow
+pytz

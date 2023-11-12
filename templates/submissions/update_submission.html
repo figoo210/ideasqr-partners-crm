@@ -1,0 +1,371 @@
+{% extends "base.html" %} {% load static %} {% block title %} Update Submission {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <!-- For Components documentaion -->
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>Update Submission</span></h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-12">
+        <!-- Account Settings -->
+        <div class="card card-default">
+          <div class="card-header">
+            <h2 class="mb-5">Basic data</h2>
+          </div>
+
+          <div class="card-body">
+            <form method="post" action="/add-submission">
+              {% csrf_token %}
+              <div class="row mb-2">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName"
+                      >Timestamp:
+                      <span class="badge badge-warning"
+                        >{{ submission.created_at }}</span
+                      ></label
+                    >
+                    <input type="text" hidden name="user_queue" value="{{ submission.user_queue }}">
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label for="firstName"
+                      >Agent Name: <span>{{ submission.user_queue.user.first_name }} {{ submission.user_queue.user.last_name|default:"No Agent" }}</span></label
+                    >
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <div class="form-group">
+                      <label for="firstName"
+                        >Team Manager: <span>{{ submission.user_queue.user.team_leader|default:"No Team Manager" }}</span></label
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName"
+                      ><span class="danger1">*</span> First Name:</label
+                    >
+                    <!-- <input name="" id="" type="" placeholder="" required class="form-control" /> -->
+                    <input
+                      name="first_name"
+                      id="first_name"
+                      type="text"
+                      placeholder="First Name"
+                      required
+                      class="form-control"
+                      value="{{ submission.first_name }}"
+                    />
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName">Middle Initial:</label>
+                    <input
+                      name="middle_initial"
+                      id="middle_initial"
+                      type="text"
+                      placeholder="Middle Initial"
+                      class="form-control"
+                      value="{{ submission.middle_initial }}"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="lastName"
+                      ><span class="danger1">*</span> Last Name</label
+                    >
+                    <input
+                      name="last_name"
+                      id="last_name"
+                      type="text"
+                      placeholder="Last Name"
+                      required
+                      class="form-control"
+                      value="{{ submission.last_name }}"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName"
+                      ><span class="danger1">*</span> Phone number:</label
+                    >
+                    <input
+                      name="phone"
+                      id="phone"
+                      type="text"
+                      placeholder="Phone Number"
+                      required
+                      class="form-control"
+                      oninput="limitInput(this, 10); this.value = this.value.replace(/[^0-9]/g, '');"
+                      value="{{ submission.phone }}"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName"
+                      ><span class="danger1">*</span> Med ID:</label
+                    >
+                    <input
+                      name="medical_id"
+                      id="medical_id"
+                      type="text"
+                      placeholder="Medical ID"
+                      required
+                      class="form-control"
+                      oninput="limitInput(this, 11)"
+                      value="{{ submission.medical_id }}"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="birth_date" > Date of birth</label>
+                    <input
+                      name="birth_date"
+                      id="birth_date"
+                      type="text"
+                      class="form-control"
+                      disabled
+                      readonly
+                      value="{{ submission.birth_date }}"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-4">
+                <label for="userName"
+                  ><span class="danger1">*</span> Address</label
+                >
+                <textarea
+                  name="address"
+                  id="address"
+                  required
+                  rows="5"
+                  class="form-control"
+                  placeholder="Lead Address"
+                >{{ submission.address }}</textarea>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName"
+                      ><span class="danger1">*</span> City:</label
+                    >
+                    <input
+                      name="city"
+                      id="city"
+                      type="text"
+                      placeholder="City"
+                      required
+                      class="form-control"
+                      value="{{ submission.city }}"
+                    />
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="firstName"
+                      ><span class="danger1">*</span> State:</label
+                    >
+                    <input
+                      name="state"
+                      id="state"
+                      type="text"
+                      placeholder="State"
+                      required
+                      class="form-control"
+                      value="{{ submission.state }}"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label for="lastName"
+                      ><span class="danger1">*</span> Zipcode:</label
+                    >
+                    <input
+                      name="zip_code"
+                      id="zip_code"
+                      type="text"
+                      placeholder="Zipcode"
+                      required
+                      class="form-control"
+                      oninput="limitInput(this, 10); this.value = this.value.replace(/[^0-9]/g, '');"
+                      value="{{ submission.zip_code }}"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-lg-4">
+                  <div class="form-group mb-4">
+                    <label for="userName"> Status:</label>
+                    <select name="status" id="status" class="form-control" >
+                      <option selected disabled>Status</option>
+                      {% for s in status %}
+                      <option {% if submission.status.name == s.name %} selected {% endif %} value="{{ s.name }}">{{s.name}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-none" id="products">
+                <div class="col-lg-12">
+                  <div class="form-group mb-4">
+                    <label for="userName" class="mb-4"> Products:</label>
+
+                    {% if not submission_products %}
+                      <h5>No Products Choosed</h5>
+                      {% else %}
+                      <table class="table-bordered w-100 text-center">
+                        <thead>
+                          <tr>
+                            <th class="py-3">
+                              <input
+                                checked
+                                disabled
+                                type="checkbox"
+                                class="form-control"
+                              />
+                            </th>
+                            <th>Product</th>
+                            <th class="w-25">Count</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for p in submission_products %}
+                          <tr>
+                            <td>
+                              <input
+                                name="checkbox-{{ forloop.counter }}"
+                                id="checkbox-{{ forloop.counter }}"
+                                type="checkbox"
+                                class="form-control"
+                                onchange="toggleCountInput(this)"
+                                checked
+                              />
+                            </td>
+                            <td>{{p.product.name}}</td>
+                            <td>
+                              <input
+                                name="count-{{ forloop.counter }}"
+                                id="count-{{ forloop.counter }}"
+                                type="number"
+                                placeholder="Count"
+                                min="1"
+                                class="form-control"
+                                disabled
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                value="{{ p.count }}"
+                              />
+                              <input
+                                name="p-{{ forloop.counter }}"
+                                id="p-{{ forloop.counter }}"
+                                type="text"
+                                hidden
+                                value="{{ p.name }}"
+                              />
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    {% endif %}
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-4">
+                <label for="comment"> Comment</label
+                >
+                <textarea
+                  name="comment"
+                  id="comment"
+                  required
+                  rows="5"
+                  class="form-control"
+                  placeholder="Commnet"
+                >{{ submission.comment }}</textarea>
+              </div>
+
+              <div class="d-flex justify-content-end mt-6">
+                <button type="submit" class="btn btn-primary mb-2 btn-pill">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% if user.role == "Team Leader" %}
+<script>
+  let inputs = document.getElementsByTagName("input");
+  if (inputs && inputs.length > 0) {
+    for (let i = 0; i < inputs.length; i++) {
+      const input = inputs[i];
+      input.disabled = true;
+    }
+  }
+</script>
+{% endif %}
+<script>
+  // Get the initial value of the status field
+  const statusField = document.getElementById("status");
+  const productsField = document.getElementById("products");
+  statusField.addEventListener("change", (e) => {
+    if (e.target.value !== "Status") {
+      productsField.className = "row mb-2";
+    } else {
+      productsField.className = "d-none";
+    }
+  });
+
+  if (statusField.value !== "Status") {
+    productsField.className = "row mb-2";
+  } else {
+    productsField.className = "d-none";
+  }
+
+  function toggleCountInput(checkbox) {
+    var countInput = document.getElementById(
+      "count-" + checkbox.id.split("-")[1]
+    );
+    countInput.disabled = !checkbox.checked;
+  }
+
+  function limitInput(inputElement, maxLength) {
+    if (inputElement.value.length > maxLength) {
+      inputElement.value = inputElement.value.slice(0, maxLength);
+    }
+  }
+</script>
+{% endblock content %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %} {% load static %} {% block title %} Task {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>Tasks</span></h2>
+      </div>
+    </div>
+
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <strong>Error(s):</strong>
+        {{ form.errors }}
+      </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-xl-12">
+        <!-- Form Square -->
+        <div class="card card-default">
+          <div class="card-header"></div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="exampleFormControlInput44">Task Name</label>
+                {{ form.name }}
+              </div>
+
+              <div class="form-group">
+                <label for="exampleFormControlPasswor3">Task Description</label>
+                {{ form.description }}
+              </div>
+
+              <div class="row">
+                <div class="form-group col-6">
+                  <label for="exampleFormControlPasswor3">Due Date</label>
+                  <div class=" d-flex justify-content-between align-items-end" id="due_date">
+                    {{ form.due_date }}
+                  </div>
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="exampleFormControlPasswor3">Assign To</label>
+                  {{ form.to_user }}
+                </div>
+              </div>
+
+              <input type="text" name="from_user" value="{{ user.id }}" hidden>
+              <div class="form-footer text-right mt-5">
+                <button type="submit" class="btn btn-secondary btn-pill">
+                  Assign task
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // edit due_date form
+  const due_date_container = document.getElementById("due_date");
+  const day_field = document.getElementById("id_due_date_day");
+  const month_field = document.getElementById("id_due_date_month");
+  const year_field = document.getElementById("id_due_date_year");
+
+  day_field.className = "form-control ";
+  month_field.className = "form-control mx-1";
+  year_field.className = "form-control ";
+
+  due_date_container.innerHTML = `
+    ${day_field.outerHTML}
+    ${month_field.outerHTML}
+    ${year_field.outerHTML}
+    `;
+</script>
+{% endblock content %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %} {% load static %} {% block title %} Employees {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <!-- Card Profile -->
+
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>Employees</span></h2>
+      </div>
+
+      {% if user.role == "Super Admin" or user.role == "Admin" %}
+      <div class="col-sm-4 text-right">
+        <a
+          class="btn btn-primary btn-pill"
+          href="/add-employee"
+          role="button"
+        >
+          Add employee
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-default">
+          <div class="card-body">
+            <table
+              id="productsTable"
+              class="table table-hover table-product"
+              style="width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Employee Name</th>
+                  <th>Employee type</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>{% if user.role == "Super Admin" or user.role == "Admin" %} Status {% else %} Username {% endif %}</th>
+                  <th>Edit/Delete/View</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                {% for u in users %}
+                  <tr>
+                    <td class="pt-3">{{ forloop.counter }}</td>
+                    <td>{{u.first_name}} {{u.last_name}}</td>
+                    <td>{{u.role}}</td>
+                    <td>{{u.email}}</td>
+                    <td>{{u.phone}}</td>
+                    <td>
+
+                      {% if user.role == "Super Admin" or user.role == "Admin" %}
+                      <select class="form-control" id="userState">
+                        {% if u.is_active %}
+                        <option selected  data-url="{% url 'activate_user' u.id %}">Active</option>
+                        <option data-url="{% url 'deactivate_user' u.id %}">Deactivate</option>
+                        {% else %}
+                        <option data-url="{% url 'activate_user' u.id %}">Active</option>
+                        <option selected data-url="{% url 'deactivate_user' u.id %}">Deactivate</option>
+                        {% endif %}
+                      </select>
+                      {% else %}
+                      {{ u.username }}
+                      {% endif %}
+
+                    </td>
+                    <td>
+                      {% if user.role == "Super Admin" or user.role == "Admin" %}
+                      <a href="/employees/edit/{{ u.id }}" class="btn btn-warning iconbtn"
+                        ><i class="mdi mdi-account-edit"></i
+                      ></a>
+                      <a href="{% url 'delete_user' u.id %}" class="btn btn-danger iconbtn"
+                        ><i class="mdi mdi-delete"></i
+                      ></a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.getElementById('userState').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    if (selectedOption.value && selectedOption.getAttribute('data-url')) {
+      const url = selectedOption.getAttribute('data-url');
+      window.location.href = url;
+    }
+  });
+</script>
+{% endblock content %}

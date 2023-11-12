@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% load static %} {% block title %} New Status {% endblock title %} {% block content %}
+<div class="content-wrapper">
+  <div class="content">
+    <div class="row page-titleall">
+      <div class="col-sm-8">
+        <h2 class="page-title"><span>New Status</span></h2>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-12">
+        <!-- Form Square -->
+        <div class="card card-default">
+          <div class="card-header"></div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label for="exampleFormControlInput44">Status Name</label>
+                {{ form.name }}
+              </div>
+              <div class="form-footer text-right">
+                <button type="submit" class="btn btn-secondary btn-pill">
+                  Submit
+                </button>
+              </div>
+            </form>
+            <a href="/status">Back to Status List</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
