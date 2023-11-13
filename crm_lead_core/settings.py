@@ -29,7 +29,24 @@ SECRET_KEY = "django-insecure-0rkgi4-#vz&mk1y7ea7e77ocb-_mnuz4lsf7tvgj#*)k8rp6a0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "crm.altajer.org",
+    "127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'https://crm.altajer.org']
+
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE =  60 * 10 * 60
+SESSION_SAVE_EVERY_REQUEST = True
 
 
 # Application definition
