@@ -1,17 +1,20 @@
 from datetime import datetime
+from django.http import JsonResponse
 
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, CreateView, UpdateView
 from django.contrib.auth import logout
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.core.paginator import Paginator
 
 from crm_lead_core.custom_views import (
     JsonableResponseMixin,
     RoleBasedPermissionMixin,
     role_required,
 )
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import CustomUser, Shift, get_all_users
 from submissions.models import Submission
@@ -31,7 +34,12 @@ class CustomLoginView(JsonableResponseMixin, LoginView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class AddEmployeeView(RoleBasedPermissionMixin, JsonableResponseMixin, CreateView):
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = "accounts/change_password.html"
+    success_url = "/account"
+
+
+class AddEmployeeView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView):
     required_roles = ["Super Admin", "Admin"]
     model = CustomUser
     template_name = "accounts/add_employee.html"
@@ -46,15 +54,23 @@ class AddEmployeeView(RoleBasedPermissionMixin, JsonableResponseMixin, CreateVie
         return super().form_valid(form)
 
 
-class UpdateEmployeeView(RoleBasedPermissionMixin, JsonableResponseMixin, UpdateView):
+class UpdateEmployeeView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin"]
     model = CustomUser
     template_name = "accounts/update_employee.html"
     success_url = "/employees"
     form_class = UpdateUserForm
 
+    def form_valid(self, form):
+        user_pk = self.kwargs["pk"]
+        user = CustomUser.objects.get(pk=user_pk)
+        new_password = form.cleaned_data["new_password"]
+        user.set_password(new_password)  # This method hashes the password
+        user.save()
+        return super().form_valid(form)
 
-class UpdateAccountView(RoleBasedPermissionMixin, JsonableResponseMixin, UpdateView):
+
+class UpdateAccountView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     model = CustomUser
     template_name = "accounts/account.html"
@@ -69,7 +85,7 @@ class UpdateAccountView(RoleBasedPermissionMixin, JsonableResponseMixin, UpdateV
         return obj
 
 
-class ProfileView(RoleBasedPermissionMixin, TemplateView):
+class ProfileView(LoginRequiredMixin, RoleBasedPermissionMixin, TemplateView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     template_name = "accounts/profile.html"
 
@@ -89,13 +105,21 @@ class ProfileView(RoleBasedPermissionMixin, TemplateView):
         return context
 
 
-class EmployeesView(RoleBasedPermissionMixin, TemplateView):
+class EmployeesView(LoginRequiredMixin, RoleBasedPermissionMixin, TemplateView):
     required_roles = ["Super Admin", "Admin", "Team Leader"]
     template_name = "accounts/employees.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["users"] = get_all_users(self.request.user)
+
+        all_data = get_all_users(self.request.user)
+        paginator = Paginator(all_data, per_page=100)
+        page_number = (
+            int(self.request.GET.get("page")) if "page" in self.request.GET else 1
+        )
+        page_obj = paginator.get_page(page_number)
+        context["users"] = page_obj
+        context["page_obj"] = page_obj
         return context
 
 
@@ -127,7 +151,7 @@ def logoutUser(request):
     return redirect("/login")
 
 
-class ShiftCreateView(RoleBasedPermissionMixin, View):
+class ShiftCreateView(LoginRequiredMixin, RoleBasedPermissionMixin, View):
     required_roles = ["Super Admin", "Admin"]
     template_name = "accounts/shift.html"
 
@@ -150,3 +174,28 @@ class ShiftCreateView(RoleBasedPermissionMixin, View):
             shift.end_time = form.data.get("end_time")
             shift.save()
         return render(request, self.template_name, {"form": form})
+
+
+class TeamLeaderSearchView(View):
+    def get(self, request, *args, **kwargs):
+        search_term = request.GET.get("search_term", "")
+        if search_term and len(search_term) > 0:
+            users = self.get_matching_users(search_term)
+            user_data = list(users.values("id", "username"))
+            return JsonResponse({"team_leaders": user_data})
+        else:
+            return JsonResponse(
+                {
+                    "team_leaders": list(
+                        CustomUser.objects.filter(team_leader=self.request.user).values(
+                            "id", "username"
+                        )
+                    )
+                }
+            )
+
+    def get_matching_users(self, search_term):
+        # Customize this method based on your User model and search criteria
+        return CustomUser.objects.filter(
+            role="Team Leader", username__icontains=search_term
+        ).all()

@@ -11,14 +11,14 @@ from crm_lead_core.custom_views import RoleBasedPermissionMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class TaskListView(RoleBasedPermissionMixin, ListView):
+class TaskListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     model = Task
     template_name = "tasks/tasks.html"
     context_object_name = "tasks"
 
 
-class TaskCreateView(RoleBasedPermissionMixin, CreateView):
+class TaskCreateView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     model = Task
     form_class = TaskForm
@@ -26,7 +26,7 @@ class TaskCreateView(RoleBasedPermissionMixin, CreateView):
     success_url = "/tasks"
 
 
-class TaskUpdateView(LoginRequiredMixin, UpdateView):
+class TaskUpdateView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     model = Task
     form_class = TaskForm

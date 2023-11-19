@@ -16,11 +16,7 @@ def role_required(required_roles):
     return decorator
 
 
-# @role_required(["Super Admin", "Admin"])
-# def my_protected_function_view(request):
-
-
-class RoleBasedPermissionMixin(LoginRequiredMixin):
+class RoleBasedPermissionMixin:
     required_roles = []
 
     def check_user_role(self, user):

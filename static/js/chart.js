@@ -2128,18 +2128,7 @@ if (barChartLg1 !== null) {
 /*======== 11.2 BAR CHART LARGE 02 ========*/
 var barChartLg2 = document.querySelector("#barchartlg2");
 if (barChartLg2 !== null) {
-  var trigoStrength = 3;
-  var iteration = 11;
-
-  function getRandom() {
-    var i = iteration;
-    return (
-      (Math.sin(i / trigoStrength) * (i / trigoStrength) +
-        i / trigoStrength +
-        1) *
-      (trigoStrength * 2)
-    );
-  }
+  var iteration = 1; // Start the iteration from 1 for team numbering
 
   function getRangeRandom(yrange) {
     return (
@@ -2147,20 +2136,12 @@ if (barChartLg2 !== null) {
     );
   }
 
-  function generateMinuteWiseTimeSeries(baseval, count, yrange) {
-    var i = 0;
+  function generateTeamData(count, yrange) {
     var series = [];
-    while (i < count) {
-      var x = baseval;
-      var y =
-        (Math.sin(i / trigoStrength) * (i / trigoStrength) +
-          i / trigoStrength +
-          1) *
-        (trigoStrength * 2);
-
-      series.push([x, y]);
-      baseval += 300000;
-      i++;
+    for (var i = 1; i <= count; i++) {
+      var teamName = "Team " + i;
+      var y = getRangeRandom(yrange);
+      series.push({ x: teamName, y: y });
     }
     return series;
   }
@@ -2169,75 +2150,19 @@ if (barChartLg2 !== null) {
     chart: {
       height: 315,
       type: "bar",
-      toolbar: {
-        show: false,
-      },
-      animations: {
-        enabled: true,
-        easing: "linear",
-        dynamicAnimation: {
-          speed: 1000,
-        },
-      },
-
-      events: {
-        animationEnd: function (chartCtx) {
-          const newData = chartCtx.w.config.series[0].data.slice();
-          newData.shift();
-          window.setTimeout(function () {
-            chartCtx.updateOptions(
-              {
-                series: [
-                  {
-                    name: "Load Average",
-                    data: newData,
-                  },
-                ],
-                xaxis: {
-                  min: chartCtx.minX,
-                  max: chartCtx.maxX,
-                },
-                subtitle: {
-                  text: parseInt(
-                    getRangeRandom({ min: 1, max: 20 })
-                  ).toString(),
-                },
-              },
-              false,
-              false
-            );
-          }, 300);
-        },
-      },
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
     },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      width: 0,
-    },
-    colors: "#9e6de0",
     series: [
       {
-        name: "Load Average",
-        data: generateMinuteWiseTimeSeries(
-          new Date("12/12/2016 00:20:00").getTime(),
-          12,
-          {
-            min: 10,
-            max: 110,
-          }
-        ),
+        name: "Number of Submissions",
+        data: generateTeamData(12, { min: 10, max: 110 }),
       },
     ],
+    xaxis: {
+      type: "category",
+      categories: [], // This will be dynamically populated with team names
+    },
     title: {
-      text: "Ave Page views per minute",
+      text: "Number of Submissions per Team",
       align: "left",
       offsetY: 35,
       style: {
@@ -2246,7 +2171,7 @@ if (barChartLg2 !== null) {
       },
     },
     subtitle: {
-      text: "20%",
+      text: "73",
       floating: false,
       align: "left",
       offsetY: 0,
@@ -2255,30 +2180,8 @@ if (barChartLg2 !== null) {
         color: "#9e6de0",
       },
     },
-    fill: {
-      type: "solid",
-      colors: "#9e6de0",
-    },
-    xaxis: {
-      type: "datetime",
-      range: 2700000,
-    },
-    legend: {
-      show: false,
-    },
     tooltip: {
       theme: "dark",
-      x: {
-        show: false,
-      },
-      y: {
-        formatter: function (val) {
-          return val;
-        },
-      },
-      marker: {
-        show: true,
-      },
     },
   };
 
@@ -2287,17 +2190,24 @@ if (barChartLg2 !== null) {
 
   window.setInterval(function () {
     iteration++;
+    var teamName = "Team " + iteration;
+    var newY = getRangeRandom({ min: 10, max: 110 });
+
+    chartColumn.updateOptions({
+      xaxis: {
+        categories: [...chartColumn.w.config.xaxis.categories, teamName],
+      },
+    });
 
     chartColumn.updateSeries([
       {
-        name: "Load Average",
         data: [
           ...chartColumn.w.config.series[0].data,
-          [chartColumn.w.globals.maxX + 210000, getRandom()],
+          { x: teamName, y: newY },
         ],
       },
     ]);
-  }, 5000);
+  }, 2000);
 }
 
 /*======== 12.1 DONUT CHART 01 ========*/

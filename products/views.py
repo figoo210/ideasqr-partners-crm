@@ -8,7 +8,7 @@ from .forms import ProductForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class ProductCreateView(RoleBasedPermissionMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView):
     required_roles = ["Super Admin", "Admin"]
     model = Product
     form_class = ProductForm
@@ -16,7 +16,7 @@ class ProductCreateView(RoleBasedPermissionMixin, CreateView):
     success_url = "/products"
 
 
-class ProductUpdateView(RoleBasedPermissionMixin, UpdateView):
+class ProductUpdateView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin"]
     model = Product
     form_class = ProductForm
@@ -24,7 +24,7 @@ class ProductUpdateView(RoleBasedPermissionMixin, UpdateView):
     success_url = "/products"
 
 
-class ProductListView(RoleBasedPermissionMixin, ListView):
+class ProductListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
     required_roles = ["Super Admin", "Admin", "Team Leader"]
     model = Product
     template_name = "products/products.html"

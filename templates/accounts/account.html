@@ -29,6 +29,9 @@
           <li class="nav-item">
             <a class="nav-link active" href="/account">Account Setting</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link " href="/change-password">Change Password</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -53,10 +56,16 @@
                   <i class="mdi mdi-settings-outline mr-1"></i> Account
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/change-password">
+                  <i class="mdi mdi-settings-outline mr-1"></i> Change Password
+                </a>
+              </li>
             </ul>
           </div>
         </div>
       </div>
+      {% comment %} Content {% endcomment %}
       <div class="col-xl-9">
         <!-- Account Settings -->
         <div class="card card-default">
@@ -65,13 +74,6 @@
           </div>
 
           <!-- Display messages -->
-
-          {% if form.errors %}
-            <div class="error-messages">
-              {{ form.errors }}
-            </div>
-          {% endif %}
-
 
           <div class="card-body">
             <form method="post" enctype="multipart/form-data">
@@ -97,6 +99,7 @@
                   <div class="form-group mb-4">
                     <label for="userName">User name</label>
                     {{ form.username }}
+                    <span class="error-message">{{ form.username.errors }}</span>
                     <span class="d-block mt-1"
                       >Username to login with.</span
                     >
@@ -111,6 +114,7 @@
                       id="birth_date"
                     >
                       {{ form.birth_date }}
+                      <span class="error-message">{{ form.birth_date.errors }}</span>
                     </div>
                   </div>
                 </div>
@@ -178,5 +182,6 @@
     ${month_field.outerHTML}
     ${year_field.outerHTML}
     `;
+
 </script>
 {% endblock content %}

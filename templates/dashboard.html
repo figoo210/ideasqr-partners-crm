@@ -2,7 +2,7 @@
 <div class="content-wrapper">
   <div class="content">
     <!-- Analytics Status -->
-    <div class="row justify-content-between mb-5">
+    <!-- <div class="row justify-content-between mb-5">
       <div class="col-lg-6"></div>
       <div
         class="col-lg-6 d-flex justify-content-xl-end flex-column flex-wrap align-items-lg-end"
@@ -13,7 +13,7 @@
         </div>
         <span class="time-zone">{{ timezone }}</span>
       </div>
-    </div>
+    </div> -->
 
     <!-- User Sessions Bounce -->
     <div class="row">
@@ -21,22 +21,22 @@
         <!-- User -->
         <div class="card card-default">
           <div class="card-header">
-            <h2>Users</h2>
+            <h2>Employees</h2>
           </div>
           <div class="card-body">
             <div
               class="bg-primary d-flex justify-content-between flex-wrap p-5 text-white align-items-lg-end"
             >
               <div class="d-flex flex-column">
-                <span class="h3 text-white">325,980</span>
-                <span>vs 275,900 (prev)</span>
+                <span class="h3 text-white">{{ users_count }}</span>
+                <span>Total employees on system</span>
               </div>
-              <div>
+              <!-- <div>
                 <span>45%</span>
                 <i class="mdi mdi-arrow-up-bold"></i>
-              </div>
+              </div> -->
             </div>
-            <div id="line-chart-1"></div>
+            <!-- <div id="line-chart-1"></div> -->
           </div>
         </div>
       </div>
@@ -44,22 +44,22 @@
         <!-- Session -->
         <div class="card card-default">
           <div class="card-header">
-            <h2>Active users</h2>
+            <h2>Active Employees</h2>
           </div>
           <div class="card-body">
             <div
               class="bg-success d-flex justify-content-between flex-wrap p-5 text-white align-items-lg-end"
             >
               <div class="d-flex flex-column">
-                <span class="h3 text-white">7,833</span>
-                <span>vs 7,012 (prev)</span>
+                <span class="h3 text-white">{{ active_users_count }}</span>
+                <span>Total employees active today</span>
               </div>
-              <div>
+              <!-- <div>
                 <span>55%</span>
                 <i class="mdi mdi-arrow-up-bold"></i>
-              </div>
+              </div> -->
             </div>
-            <div id="line-chart-2"></div>
+            <!-- <div id="line-chart-2"></div> -->
           </div>
         </div>
       </div>
@@ -67,22 +67,22 @@
         <!-- Bounce Rate -->
         <div class="card card-default">
           <div class="card-header">
-            <h2>Inactive users</h2>
+            <h2>Inactive Employees</h2>
           </div>
           <div class="card-body">
             <div
               class="bg-danger d-flex justify-content-between flex-wrap p-5 text-white align-items-lg-end"
             >
               <div class="d-flex flex-column">
-                <span class="h3 text-white">67.0%</span>
-                <span>vs 65.21% (prev)</span>
+                <span class="h3 text-white">{{ inactive_users_count }}</span>
+                <span>Total employees inactive today</span>
               </div>
-              <div>
+              <!-- <div>
                 <span>7%</span>
                 <i class="mdi mdi-arrow-down-bold"></i>
-              </div>
+              </div> -->
             </div>
-            <div id="line-chart-3"></div>
+            <!-- <div id="line-chart-3"></div> -->
           </div>
         </div>
       </div>
@@ -178,18 +178,43 @@
         <!-- Current Users  -->
         <div class="card card-default">
           <div class="card-header">
-            <h2>Current Users</h2>
+            <h2>Employees Submissions</h2>
             <span>Realtime</span>
           </div>
           <div class="card-body">
-            <div id="barchartlg2"></div>
+            {% comment %} <div id="barchartlg2"></div> {% endcomment %}
+            <div id="chartTable"></div>
           </div>
           <div class="card-footer bg-white py-4">
-            <a href="#" class="text-uppercase">Current Users Overview</a>
+            {% comment %} <a href="#" class="text-uppercase">Current Users Overview</a> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-xl-12">
+        <!-- Current Users  -->
+        <div class="card card-default">
+          <div class="card-header">
+            <h2>Teams Performance</h2>
+            <span>Realtime</span>
+          </div>
+          <div class="card-body">
+            {% comment %} <div id="barchartlg2"></div> {% endcomment %}
+            <div id="submissionsChart"></div>
+          </div>
+          <div class="card-footer bg-white py-4">
+            {% comment %} <a href="#" class="text-uppercase">Current Users Overview</a> {% endcomment %}
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<input type="text" id="DASHBOARD_WEBSOCKET_URL" value="{{ DASHBOARD_WEBSOCKET_URL }}" hidden>
+<input type="text" id="REALTIME_WEBSOCKET_URL" value="{{ REALTIME_WEBSOCKET_URL }}" hidden>
+<script type="module" src="{% static 'js/dashboard_websocket.js' %}"></script>
+
 {% endblock content %}

@@ -44,16 +44,16 @@
               <tbody>
 
                 {% for u in users %}
-                  <tr>
+                  <tr class="searchCol">
                     <td class="pt-3">{{ forloop.counter }}</td>
-                    <td>{{u.first_name}} {{u.last_name}}</td>
+                    <td class="name">{{u.first_name}} {{u.last_name}}</td>
                     <td>{{u.role}}</td>
-                    <td>{{u.email}}</td>
+                    <td class="email">{{u.email}}</td>
                     <td>{{u.phone}}</td>
                     <td>
 
                       {% if user.role == "Super Admin" or user.role == "Admin" %}
-                      <select class="form-control" id="userState">
+                      <select class="form-control" id="userState-{{ forloop.counter }}">
                         {% if u.is_active %}
                         <option selected  data-url="{% url 'activate_user' u.id %}">Active</option>
                         <option data-url="{% url 'deactivate_user' u.id %}">Deactivate</option>
@@ -83,6 +83,28 @@
               </tbody>
             </table>
           </div>
+          <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+            {% endif %}
+
+            <!-- Loop through page numbers -->
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <span class="current">{{ i }}</span>
+                {% else %}
+                  {% if i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                    <a href="?page={{ i }}">{{ i }}</a>
+                  {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
@@ -91,11 +113,38 @@
 
 
 <script>
-  document.getElementById('userState').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    if (selectedOption.value && selectedOption.getAttribute('data-url')) {
-      const url = selectedOption.getAttribute('data-url');
-      window.location.href = url;
+  const userStates = document.querySelectorAll('[id^="userState-"]');
+  for (let q = 0; q < userStates.length; q++) {
+    const userState = userStates[q];
+    userState.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      if (selectedOption.value && selectedOption.getAttribute('data-url')) {
+        const url = selectedOption.getAttribute('data-url');
+        window.location.href = url;
+      }
+    });
+  };
+
+  const searchInput = document.getElementById("search-input");
+  searchInput.disabled = false;
+  searchInput.placeholder = "Search by Name or Email ..."
+  searchInput.addEventListener("input", event => {
+    let searchValue = event.target.value;
+    let rows = document.getElementsByClassName("searchCol")
+    for (let sn = 0; sn < rows.length; sn++) {
+      const row = rows[sn];
+      const rowNameValue = rows[sn].querySelector(".name").textContent;
+      const rowEmailValue = rows[sn].querySelector(".email").textContent;
+      console.log(rowNameValue);
+      console.log(rowEmailValue);
+      if (searchValue && searchValue.trim().length > 0 &&
+        !rowNameValue.toLowerCase().includes(searchValue.toLowerCase()) &&
+        !rowEmailValue.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        row.className = "searchCol d-none";
+      } else {
+        row.className = "searchCol";
+      }
     }
   });
 </script>

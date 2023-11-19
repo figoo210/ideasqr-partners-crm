@@ -34,24 +34,26 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'https://crm.altajer.org']
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1", "https://crm.altajer.org"]
 
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE =  60 * 10 * 60
+SESSION_COOKIE_AGE = 60 * 10 * 60
 SESSION_SAVE_EVERY_REQUEST = True
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Other Apps
+    "daphne",
     # Built-in
     "django.contrib.admin",
     "django.contrib.auth",
@@ -167,3 +169,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.CustomUser"
 
 LOGIN_URL = "/login"
+
+ASGI_APPLICATION = "crm_lead_core.asgi.application"

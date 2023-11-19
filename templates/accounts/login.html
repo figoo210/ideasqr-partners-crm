@@ -123,6 +123,10 @@
       username.placeholder = "Username";
       password.className = "form-control input-lg";
       password.placeholder = "Password";
+
+      console.log(document.querySelector(".errorlist").getElementsByTagName("li")[0].innerHTML);
+      document.querySelector(".errorlist").getElementsByTagName("li")[0].innerHTML = document.querySelector(".errorlist").getElementsByTagName("li")[0].innerHTML.replace("__all__", "");
+
     </script>
   </body>
 </html>

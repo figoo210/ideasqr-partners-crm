@@ -75,14 +75,15 @@
     <!-- FAVICON -->
     <link href="{% static 'images/favicon.png' %}" rel="shortcut icon" />
 
-    <!--
-    HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
-  -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <!-- Tabulator -->
+    <link href="{% static 'tabulator/dist/css/tabulator.min.css' %}" rel="stylesheet">
+    <link
+      id="main-css-href"
+      rel="stylesheet"
+      href="{% static 'css/tabulator.css' %}"
+    />
+    <script type="text/javascript" src="{% static 'tabulator/dist/js/tabulator.min.js' %}"></script>
+
     <script src="{% static 'plugins/nprogress/nprogress.js' %}"></script>
     <title>Partners | {% block title %}{% endblock title %}</title>
   </head>
@@ -122,44 +123,18 @@
                 </a>
               </li>
 
+              {% if user.role != "Employee" %}
               <li>
                 <a class="sidenav-item-link" href="/employees">
                   <i class="mdi mdi-account-box-multiple"></i>
                   <span class="nav-text">Employees</span>
                 </a>
               </li>
+              {% endif %}
+
 
               <!--
-              <li class="has-sub">
-                <a
-                  class="sidenav-item-link"
-                  href="javascript:void(0)"
-                  data-toggle="collapse"
-                  data-target="#email"
-                  aria-expanded="false"
-                  aria-controls="email"
-                >
-                  <i class="mdi mdi-account-box-multiple"></i>
-                  <span class="nav-text">Employees</span> <b class="caret"></b>
-                </a>
-                <ul class="collapse" id="email" data-parent="#sidebar-menu">
-                  <div class="sub-menu">
-                    <li>
-                      <a class="sidenav-item-link" href="/roles">
-                        <span class="nav-text">Employee type</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="sidenav-item-link" href="/employees">
-                        <span class="nav-text">Employees</span>
-                      </a>
-                    </li>
-                  </div>
-                </ul>
-                -->
-
-              </li>
-
+              {% if user.role != "Employee" %}
               <li class="has-sub">
                 <a
                   class="sidenav-item-link"
@@ -193,6 +168,8 @@
                   </div>
                 </ul>
               </li>
+              {% endif %}
+              -->
 
               <li>
                 <a class="sidenav-item-link" href="/tasks">
@@ -201,6 +178,7 @@
                 </a>
               </li>
 
+              {% if user.role == "Super Admin" %}
               <li class="has-sub">
                 <a
                   class="sidenav-item-link"
@@ -238,6 +216,7 @@
                   </div>
                 </ul>
               </li>
+              {% endif %}
 
               <li>
                 <a class="sidenav-item-link" href="/logout">
@@ -274,12 +253,14 @@
                       id="search-input"
                       class="form-control"
                       placeholder="Search..."
+                      disabled
                     />
                     <div class="input-group-append">
                       <button class="btn" type="button">/</button>
                     </div>
                   </div>
                 </form>
+                <!--
                 <ul class="dropdown-menu dropdown-menu-search">
                   <li class="nav-item">
                     <a class="nav-link" href="index.html">Morbi leo risus</a>
@@ -298,6 +279,7 @@
                     <a class="nav-link" href="index.html">Vestibulum at eros</a>
                   </li>
                 </ul>
+                -->
               </div>
 
               <ul class="nav navbar-nav">
@@ -406,7 +388,7 @@
     </script>
 
     <script src="{% static 'js/mono.js' %}"></script>
-    <script src="{% static 'js/chart.js' %}"></script>
+    <script type="module" src="{% static 'js/chart.js' %}"></script>
     <script src="{% static 'js/map.js' %}"></script>
     <script src="{% static 'js/custom.js' %}"></script>
   </body>

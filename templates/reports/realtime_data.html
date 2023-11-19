@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="stylesheet" href="{% static 'css/realtime_data_screen.css' %}" />
+
+    <title>Realtime Data</title>
+  </head>
+  <body>
+    <div class="bgImage"></div>
+    <div class="loader"></div>
+    <div class="customContainer">
+      <table id="stockTable">
+        <thead>
+          <tr id="totals">
+          </tr>
+          <tr id="teams">
+          </tr>
+        </thead>
+        <tbody id="employeesData">
+        </tbody>
+      </table>
+    </div>
+  </body>
+
+  <input
+    type="text"
+    hidden
+    id="REALTIME_WEBSOCKET_URL"
+    value="{{ REALTIME_WEBSOCKET_URL }}"
+  />
+  <script
+    type="module"
+    src="{% static 'js/realtime_data_screen.js' %}"
+  ></script>
+</html>

@@ -5,7 +5,9 @@ from django.utils import timezone
 
 
 class CustomUser(AbstractUser, PermissionsMixin):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(
+        primary_key=True, max_length=36, default=uuid.uuid4, editable=False
+    )
     is_active = models.BooleanField(default=True)
 
     CUSTOM_ROLES = (
@@ -27,12 +29,22 @@ class CustomUser(AbstractUser, PermissionsMixin):
         "self", null=True, blank=True, on_delete=models.SET_NULL
     )
 
+    def is_online(self):
+        # Check if last login is within the last 9 hours
+        if self.last_login:
+            return timezone.now() - self.last_login <= timezone.timedelta(hours=9)
+        return False
+
 
 def get_all_users(user):
+    user_team_leaders = CustomUser.objects.filter(
+        is_staff=False, is_superuser=False, team_leader=user
+    ).all()
+    user_team_leaders_employees = CustomUser.objects.filter(
+        is_staff=False, is_superuser=False, team_leader__in=user_team_leaders
+    ).all()
     return (
-        CustomUser.objects.filter(
-            is_staff=False, is_superuser=False, team_leader=user
-        ).all()
+        user_team_leaders | user_team_leaders_employees
         if user.role != "Super Admin"
         else CustomUser.objects.filter(is_staff=False, is_superuser=False).all()
     )
@@ -43,4 +55,4 @@ class Shift(models.Model):
     end_time = models.TimeField()
 
     def __str__(self):
-        return f"Shift from {self.start_time} to {self.start_time}"
+        return f"Shift from {self.start_time} to {self.end_time}"

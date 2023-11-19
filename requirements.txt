@@ -3,3 +3,7 @@ mysqlclient
 Django
 Pillow
 pytz
+daphne
+channels
+pandas
+faker

@@ -2,8 +2,10 @@ from django.urls import path
 from .views import (
     CustomLoginView,
     AddEmployeeView,
+    CustomPasswordChangeView,
     EmployeesView,
     ShiftCreateView,
+    TeamLeaderSearchView,
     UpdateEmployeeView,
     UpdateAccountView,
     ProfileView,
@@ -15,6 +17,7 @@ from .views import (
 
 urlpatterns = [
     path("login", CustomLoginView.as_view(), name="Login"),
+    path("change-password", CustomPasswordChangeView.as_view(), name="password_change"),
     path("logout", logoutUser, name="Logout"),
     path("add-employee", AddEmployeeView.as_view(), name="add_employee"),
     path("employees", EmployeesView.as_view(), name="employees"),
@@ -28,4 +31,8 @@ urlpatterns = [
     ),
     # SHIFT
     path("shift", ShiftCreateView.as_view(), name="shift_create"),
+    # SEARCH
+    path(
+        "team-leader-search/", TeamLeaderSearchView.as_view(), name="team_leader_search"
+    ),
 ]

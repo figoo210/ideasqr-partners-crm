@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.views.generic import CreateView, UpdateView, ListView
 from django.urls import reverse_lazy
 from django.db.models import OuterRef, Subquery
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.models import CustomUser, get_all_users
 from crm_lead_core.custom_views import RoleBasedPermissionMixin, role_required
@@ -10,7 +11,7 @@ from .forms import QueueForm
 from .models import Queue, UserQueue
 
 
-class QueueCreateView(RoleBasedPermissionMixin, CreateView):
+class QueueCreateView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView):
     required_roles = ["Super Admin", "Admin"]
     model = Queue
     form_class = QueueForm
@@ -18,7 +19,7 @@ class QueueCreateView(RoleBasedPermissionMixin, CreateView):
     success_url = "/queues"
 
 
-class QueueUpdateView(RoleBasedPermissionMixin, UpdateView):
+class QueueUpdateView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin"]
     model = Queue
     form_class = QueueForm
@@ -26,7 +27,7 @@ class QueueUpdateView(RoleBasedPermissionMixin, UpdateView):
     success_url = "/queues"
 
 
-class QueueListView(RoleBasedPermissionMixin, ListView):
+class QueueListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
     required_roles = ["Super Admin", "Admin", "Team Leader"]
     model = Queue
     template_name = "queues/queues.html"

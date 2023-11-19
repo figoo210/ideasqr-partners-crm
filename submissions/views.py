@@ -2,7 +2,9 @@ import fnmatch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic import TemplateView, CreateView, UpdateView, ListView
+from django.core.paginator import Paginator
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import datetime
 from accounts.models import CustomUser
@@ -11,12 +13,13 @@ from feedbacks.models import Feedback
 
 from products.models import Product, SubmissionProducts
 from queues.models import UserQueue
+from reports.realtime_data import send_realtime_data
 
 from .forms import AddSubmissionForm, StatusForm
 from .models import Status, Submission, get_submissions_based_on_role
 
 
-class SubmissionsView(RoleBasedPermissionMixin, TemplateView):
+class SubmissionsView(LoginRequiredMixin, RoleBasedPermissionMixin, TemplateView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     template_name = "submissions/submissions.html"
 
@@ -38,17 +41,25 @@ class SubmissionsView(RoleBasedPermissionMixin, TemplateView):
                 team_leader=self.request.user
             ).all()
 
-        context["submissions"] = get_submissions_based_on_role(
+        all_data = get_submissions_based_on_role(
             user=self.request.user,
             user_team_leaders=user_team_leaders,
             user_team_leaders_employees=user_team_leaders_employees,
         )
+        paginator = Paginator(all_data, per_page=100)
+        page_number = (
+            int(self.request.GET.get("page")) if "page" in self.request.GET else 1
+        )
+        page_obj = paginator.get_page(page_number)
+
+        context["page_obj"] = page_obj
+        context["submissions"] = page_obj
         context["all_status"] = Status.objects.all()
         context["feedbacks"] = Feedback.objects.all()
         return context
 
 
-class AddSubmissionView(RoleBasedPermissionMixin, CreateView):
+class AddSubmissionView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView):
     required_roles = ["Super Admin", "Admin", "Team Leader", "Employee"]
     template_name = "submissions/add_submission.html"
     model = Submission
@@ -56,14 +67,13 @@ class AddSubmissionView(RoleBasedPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         timenow = datetime.now().strftime("%d/%m/%Y %I:%M %p")
         context["timestamp"] = timenow
         context[
             "employee"
         ] = f"{self.request.user.first_name} {self.request.user.last_name}"
         context["team_leader"] = (
-            f"{self.request.user.team_leader.first_name} {self.request.user.team_leader.last_name}"
+            f"{self.request.user.team_leader.first_name if self.request.user.team_leader else self.request.user.first_name} {self.request.user.team_leader.last_name if self.request.user.team_leader else self.request.user.last_name}"
             or "No Team Manager"
         )
         context["status"] = Status.objects.all()
@@ -91,7 +101,7 @@ class AddSubmissionView(RoleBasedPermissionMixin, CreateView):
                 # status=data["status"],
                 user_queue=UserQueue.objects.filter(user=self.request.user).last(),
             )
-            new_submission.save()
+            new_submission.save(request=request)
 
             # Submission Products
             wildcard_checkbox = "checkbox-*"
@@ -108,10 +118,11 @@ class AddSubmissionView(RoleBasedPermissionMixin, CreateView):
                     product=product,
                 )
                 new_submission_product.save()
+        send_realtime_data("get data")
         return redirect("/submissions")
 
 
-class UpdateSubmissionView(RoleBasedPermissionMixin, UpdateView):
+class UpdateSubmissionView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin", "Team Leader"]
     template_name = "submissions/update_submission.html"
     model = Submission
@@ -205,7 +216,7 @@ def add_submission_feedback(request, *args, **kwargs):
         return redirect("/submissions")
 
 
-class StatusCreateView(RoleBasedPermissionMixin, CreateView):
+class StatusCreateView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView):
     required_roles = ["Super Admin", "Admin"]
     model = Status
     form_class = StatusForm
@@ -213,7 +224,7 @@ class StatusCreateView(RoleBasedPermissionMixin, CreateView):
     success_url = "/status"
 
 
-class StatusUpdateView(RoleBasedPermissionMixin, UpdateView):
+class StatusUpdateView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     required_roles = ["Super Admin", "Admin"]
     model = Status
     form_class = StatusForm
@@ -221,8 +232,15 @@ class StatusUpdateView(RoleBasedPermissionMixin, UpdateView):
     success_url = "/status"
 
 
-class StatusListView(RoleBasedPermissionMixin, ListView):
+class StatusListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
     required_roles = ["Super Admin", "Admin", "Team Leader"]
     model = Status
     template_name = "status/status.html"
     context_object_name = "status"
+
+
+@role_required(["Super Admin"])
+def delete_status(request, status_name):
+    status = Status.objects.get(pk=status_name)
+    status.delete()
+    return redirect("/status")

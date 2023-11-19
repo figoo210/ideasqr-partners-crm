@@ -15,16 +15,3 @@ class UserQueue(TimestampedModel):
     )
     queue = models.ForeignKey(Queue, on_delete=models.SET_NULL, null=True)
     website = models.CharField(max_length=255, null=True, blank=True)
-
-    # shift_start = models.TimeField(
-    #     auto_now=False,
-    #     auto_now_add=False,
-    #     null=True,
-    #     blank=True,
-    # )
-    # shift_end = models.TimeField(
-    #     auto_now=False,
-    #     auto_now_add=False,
-    #     null=True,
-    #     blank=True,
-    # )

@@ -48,6 +48,8 @@ update_fields = [
 
 
 class UpdateUserForm(forms.ModelForm):
+    new_password = forms.CharField(widget=forms.PasswordInput())
+
     def __init__(self, *args, **kwargs):
         super(UpdateUserForm, self).__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
@@ -60,6 +62,7 @@ class UpdateUserForm(forms.ModelForm):
         )
         self.fields["role"].required = False
         self.fields["team_leader"].required = False
+        # self.new_password.is_required = False
 
     class Meta:
         model = CustomUser

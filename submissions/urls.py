@@ -9,6 +9,7 @@ from .views import (
     update_submission_status,
     update_submission_comment,
     add_submission_feedback,
+    delete_status,
 )
 
 urlpatterns = [
@@ -37,4 +38,5 @@ urlpatterns = [
     path("status/", StatusListView.as_view(), name="status_list"),
     path("status/create", StatusCreateView.as_view(), name="status_create"),
     path("status/<str:pk>/update", StatusUpdateView.as_view(), name="status_update"),
+    path("status/<str:status_name>/delete", delete_status, name="status_delete"),
 ]

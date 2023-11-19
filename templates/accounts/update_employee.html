@@ -19,11 +19,8 @@
           <!-- Display messages -->
 
           {% if form.errors %}
-            <div class="error-messages">
-              {{ form.errors }}
-            </div>
+          <div class="error-messages">{{ form.errors }}</div>
           {% endif %}
-
 
           <div class="card-body">
             <form method="post" enctype="multipart/form-data">
@@ -46,36 +43,28 @@
               </div>
 
               <div class="row mb-4">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                   <div class="form-group">
                     <label for="userName">Username</label>
                     {{ form.username }}
-                    <span class="d-block mt-1"
-                      >Username to login with.</span
-                    >
+                    <span class="d-block mt-1">Username to login with.</span>
                   </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                   <div class="form-group">
-                    <label for="role">Team Leader</label>
-                    {{ form.team_leader }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="row mb-2">
-                <div class="col-lg-6">
-                  <div class="form-group">
-                    <label for="role">User type</label>
-                    {{ form.role }}
+                    <label for="userName">Password</label>
+                    {{ form.new_password }}
                   </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                   <div class="form-group">
                     <label for="birth_date">Date of Birth</label>
-                    <div class=" d-flex justify-content-between align-items-end" id="birth_date">
+                    <div
+                      class="d-flex justify-content-between align-items-end"
+                      id="birth_date"
+                    >
                       {{ form.birth_date }}
                     </div>
                   </div>
@@ -85,9 +74,46 @@
               <div class="row mb-2">
                 <div class="col-lg-6">
                   <div class="form-group">
+                    <label for="role">User type</label>
+                    <select name="role" class="form-control" id="id_role">
+                      <option disabled selected></option>
+                      {% if user.role == "Super Admin" %}
+                      <option value="Admin">Admin</option>
+                      <option value="Team Leader" >
+                        Team Leader
+                      </option>
+                      <option value="Employee">Employee</option>
+                      {% elif user.role == "Admin" %}
+                      <option value="Team Leader" selected="">
+                        Team Leader
+                      </option>
+                      <option value="Employee">Employee</option>
+                      {% else %}
+                      <option value="Employee">Employee</option>
+                      {% endif %}
+                    </select>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group" id="team_leader">
+                    <label for="role">Team Leader</label>
+                    <input
+                      type="text"
+                      name="team_leader"
+                      class="form-control"
+                      id="id_team_leader"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-2">
+                <div class="col-lg-6">
+                  <div class="form-group">
                     <label for="email">Email</label>
                     {{ form.email }}
-                </div>
+                  </div>
                 </div>
 
                 <div class="col-lg-6">
@@ -105,13 +131,21 @@
 
               <div class="form-group mb-4">
                 <img
-                {% if form.image.value %}
-                src="{{ form.image.value.url }}"
-                {% else %}
-                src="{% static 'images/user/u7.jpg' %}"
-                {% endif %}
-                alt="Profile Pic Preview"
-                class="img-fluid userimage" />
+                  {%
+                  if
+                  form.image.value
+                  %}
+                  src="{{ form.image.value.url }}"
+                  {%
+                  else
+                  %}
+                  src="{% static 'images/user/u7.jpg' %}"
+                  {%
+                  endif
+                  %}
+                  alt="Profile Pic Preview"
+                  class="img-fluid userimage"
+                />
               </div>
 
               <div class="d-flex justify-content-end mt-6">
@@ -127,8 +161,9 @@
   </div>
 </div>
 
-
 <script>
+  document.getElementById("team_leader").style.display = "none";
+
   // edit birth_date form
   const birth_date_container = document.getElementById("birth_date");
   const day_field = document.getElementById("id_birth_date_day");
@@ -144,5 +179,96 @@
     ${month_field.outerHTML}
     ${year_field.outerHTML}
     `;
+
+  document.getElementById("id_role").addEventListener("change", (event) => {
+    let role = event.target.value;
+    if (role === "Team Leader") {
+      document.getElementById("team_leader").style.display = "none";
+    } else {
+      document.getElementById("team_leader").style.display = "block";
+    }
+  });
 </script>
+
+<!-- Search Field -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let teamLeaderInput = document.getElementById("id_team_leader");
+    let teamLeaderContainer = document.getElementById("team_leader");
+    let dropdown;
+
+    teamLeaderInput.addEventListener("focus", function () {
+      // Simulate fetching user data (replace this with your actual endpoint)
+      let userData = "";
+
+      // Create a dropdown element
+      dropdown = document.createElement("div");
+      dropdown.className =
+        "dropdown d-block position-absolute bg-dark w-100 text-light p-1";
+      dropdown.style.zIndex = 10000;
+      teamLeaderInput.placeholder = "Search for a team leader";
+
+      teamLeaderInput.addEventListener("input", function () {
+        let searchTerm = teamLeaderInput.value.toLowerCase();
+
+        // Make an AJAX request to the Django view
+        fetch("/team-leader-search/?search_term=" + searchTerm)
+          .then((response) => response.json())
+          .then((data) => {
+            // Update the dropdown with the fetched data
+            updateDropdown(data.team_leaders);
+          });
+      });
+
+      // Create a list to display user options
+      let userList = document.createElement("ul");
+      userList.className = "user-list";
+
+      // Append elements to the dropdown
+      dropdown.appendChild(userList);
+
+      // Append the dropdown to the body
+      teamLeaderContainer.appendChild(dropdown);
+
+      // Add users to the list
+      fetch("/team-leader-search/")
+        .then((response) => response.json())
+        .then((data) => {
+          // Update the dropdown with the fetched data
+          updateDropdown(data.team_leaders);
+        });
+
+      // Close the dropdown when clicking outside of it
+      document.addEventListener("click", function (event) {
+        if (
+          !dropdown.contains(event.target) &&
+          event.target !== teamLeaderInput
+        ) {
+          dropdown.remove();
+        }
+      });
+    });
+
+    function updateDropdown(users) {
+      let userList = document.querySelector(".user-list");
+      userList.innerHTML = ""; // Clear existing options
+
+      // Create and append user options to the list
+      users.forEach(function (user) {
+        let listItem = document.createElement("li");
+        listItem.className = "searchFieldDropdownItem";
+        listItem.textContent = user.username;
+
+        // Handle user selection
+        listItem.addEventListener("click", function () {
+          teamLeaderInput.value = user.username;
+          dropdown.remove();
+        });
+
+        userList.appendChild(listItem);
+      });
+    }
+  });
+</script>
+
 {% endblock content %}

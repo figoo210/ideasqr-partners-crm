@@ -5,7 +5,7 @@
 
     <div class="row page-titleall">
       <div class="col-sm-8">
-        <h2 class="page-title"><span>Submissions</span></h2>
+        <h2 class="page-title"><span>Submissions {{ number_of_pages }}</span></h2>
       </div>
       <div class="col-sm-4 text-right">
         <a
@@ -48,10 +48,11 @@
                     data-target="#accordion-row-{{ forloop.counter }}"
                     aria-expanded="false"
                     aria-controls="accordion-row-{{ forloop.counter }}"
+                    class="searchCol bg-light"
                   >
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ forloop.counter }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.first_name }} {{ submission.last_name }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.phone }}</div></td>
+                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center name">{{ submission.first_name }} {{ submission.last_name }}</div></td>
+                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center phone">{{ submission.phone }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.user_queue.user.team_leader }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.birth_date }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.address }}</div></td>
@@ -153,6 +154,29 @@
               </tbody>
             </table>
           </div>
+          <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+            {% endif %}
+
+            <!-- Loop through page numbers -->
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <span class="current">{{ i }}</span>
+                {% else %}
+                  {% if i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                    <a href="?page={{ i }}">{{ i }}</a>
+                  {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+          </div>
+
         </div>
       </div>
     </div>
@@ -171,6 +195,29 @@
       }
     });
   }
+
+  const searchInput = document.getElementById("search-input");
+  searchInput.disabled = false;
+  searchInput.placeholder = "Search by Name or Phone ..."
+  searchInput.addEventListener("input", event => {
+    let searchValue = event.target.value;
+    let rows = document.getElementsByClassName("searchCol")
+    for (let sn = 0; sn < rows.length; sn++) {
+      const row = rows[sn];
+      const rowNameValue = rows[sn].querySelector(".name").textContent;
+      const rowPhoneValue = rows[sn].querySelector(".phone").textContent;
+      console.log(rowNameValue);
+      console.log(rowPhoneValue);
+      if (searchValue && searchValue.trim().length > 0 &&
+        !rowNameValue.toLowerCase().includes(searchValue.toLowerCase()) &&
+        !rowPhoneValue.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        row.className = "searchCol d-none";
+      } else {
+        row.className = "searchCol";
+      }
+    }
+  });
 
 </script>
 {% endblock content %}
