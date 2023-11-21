@@ -1,0 +1,30 @@
+/* Style the table header */
+.tabulator-header {
+  background-color: #f4f4f4 !important;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Style the table row even/odd */
+.tabulator-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Style the selected row */
+.tabulator-row.tabulator-selected {
+  background-color: #e0e0e0;
+}
+
+/* Style the cells */
+.tabulator-cell {
+  padding: 8px;
+}
+
+/* Style the columns */
+.tabulator-col {
+  border-right: 1px solid #ddd;
+}
+
+/* Style the last column */
+.tabulator-col.tabulator-col-last {
+  border-right: none;
+}

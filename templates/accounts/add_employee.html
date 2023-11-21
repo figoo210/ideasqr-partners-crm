@@ -93,7 +93,7 @@
                     <label for="role">Team Leader</label>
                     <input
                       type="text"
-                      name="team_leader"
+                      name="team_leader_username"
                       class="form-control"
                       id="id_team_leader"
                     />
@@ -178,6 +178,17 @@
     } else {
       document.getElementById("team_leader").style.display = "block";
     }
+  });
+
+  let passwordFields = document.querySelectorAll("input[type='password']");
+  console.log(passwordFields);
+  passwordFields.forEach(field => {
+    field.addEventListener('focus', () => {
+      field.type = 'text';
+    });
+    field.addEventListener('blur', () => {
+      field.type = 'password';
+    });
   });
 </script>
 

@@ -61,6 +61,13 @@ class UpdateEmployeeView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateVie
     success_url = "/employees"
     form_class = UpdateUserForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["team_leader_username"] = CustomUser.objects.get(
+            pk=self.kwargs["pk"]
+        ).team_leader.username
+        return context
+
     def form_valid(self, form):
         user_pk = self.kwargs["pk"]
         user = CustomUser.objects.get(pk=user_pk)
@@ -199,3 +206,17 @@ class TeamLeaderSearchView(View):
         return CustomUser.objects.filter(
             role="Team Leader", username__icontains=search_term
         ).all()
+
+
+class EmployeeSearchView(View):
+    def get(self, request, *args, **kwargs):
+        search_term = request.GET.get("search_term", "")
+        users = get_all_users(self.request.user)
+        if search_term and len(search_term) > 0:
+            user_data = list(
+                users.filter(username__icontains=search_term).values("id", "username")
+            )
+            return JsonResponse({"employees": user_data})
+        else:
+            user_data = list(users.values("id", "username"))
+            return JsonResponse({"employees": user_data})

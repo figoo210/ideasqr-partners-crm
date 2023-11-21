@@ -98,7 +98,7 @@ class AddSubmissionView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView
                 state=data["state"],
                 zip_code=data["zip_code"],
                 comment=data["comment"],
-                # status=data["status"],
+                status=Status.objects.get(name=data["status"]),
                 user_queue=UserQueue.objects.filter(user=self.request.user).last(),
             )
             new_submission.save(request=request)
@@ -143,40 +143,22 @@ class UpdateSubmissionView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateV
     def post(self, request, **kwargs):
         if request.POST:
             data = request.POST
-            new_submission = Submission(
-                medical_id=data["medical_id"],
-                first_name=data["first_name"],
-                last_name=data["last_name"],
-                middle_initial=data["middle_initial"]
-                if "middle_initial" in data
-                else None,
-                phone=data["phone"],
-                birth_date=f'{data["birth_date_year"]}-{data["birth_date_month"]}-{data["birth_date_day"]}',
-                address=data["address"],
-                city=data["city"],
-                state=data["state"],
-                zip_code=data["zip_code"],
-                comment=data["comment"],
-                # status=data["status"],
-                user_queue=UserQueue.objects.filter(user=self.request.user).last(),
+            submission = Submission.objects.get(pk=self.kwargs["pk"])
+            submission.medical_id = data["medical_id"]
+            submission.first_name = data["first_name"]
+            submission.last_name = data["last_name"]
+            submission.middle_initial = (
+                data["middle_initial"] if "middle_initial" in data else None
             )
-            new_submission.save()
+            submission.phone = data["phone"]
+            submission.address = data["address"]
+            submission.city = data["city"]
+            submission.state = data["state"]
+            submission.zip_code = data["zip_code"]
+            submission.comment = data["comment"]
+            submission.status = Status.objects.get(name=data["status"])
+            submission.save()
 
-            # Submission Products
-            wildcard_checkbox = "checkbox-*"
-            matching_keys = [
-                key for key in data if fnmatch.fnmatch(key, wildcard_checkbox)
-            ]
-            for k in matching_keys:
-                product = Product.objects.get(pk=data[f"count-{k.split('-')[1]}"])
-                new_submission_product = SubmissionProducts(
-                    count=int(data[f"count-{k.split('-')[1]}"])
-                    if f"count-{k.split('-')[1]}" in data
-                    else 1,
-                    submission=new_submission,
-                    product=product,
-                )
-                new_submission_product.save()
         return redirect("/submissions")
 
 

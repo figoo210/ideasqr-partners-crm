@@ -40,9 +40,9 @@
                   </div>
                 </div>
 
-                <div class="form-group col-6">
+                <div class="form-group col-6" id="to_user_container">
                   <label for="exampleFormControlPasswor3">Assign To</label>
-                  {{ form.to_user }}
+                  <input type="text" name="username" class="form-control" required="" id="id_to_user">
                 </div>
               </div>
 
@@ -78,4 +78,86 @@
     ${year_field.outerHTML}
     `;
 </script>
+
+<!-- Search Field -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let userInput = document.getElementById("id_to_user");
+    let userContainer = document.getElementById("to_user_container");
+    let dropdown;
+
+    userInput.addEventListener("focus", function () {
+      // Simulate fetching user data (replace this with your actual endpoint)
+      let userData = "";
+
+      // Create a dropdown element
+      dropdown = document.createElement("div");
+      dropdown.className =
+        "dropdown d-block position-absolute bg-dark w-100 text-light p-1";
+      dropdown.style.zIndex = 10000;
+      userInput.placeholder = "Search for an employee";
+
+      userInput.addEventListener("input", function () {
+        let searchTerm = userInput.value.toLowerCase();
+
+        // Make an AJAX request to the Django view
+        fetch("/user-search/?search_term=" + searchTerm)
+          .then((response) => response.json())
+          .then((data) => {
+            // Update the dropdown with the fetched data
+            updateDropdown(data.employees);
+          });
+      });
+
+      // Create a list to display user options
+      let userList = document.createElement("ul");
+      userList.className = "user-list";
+
+      // Append elements to the dropdown
+      dropdown.appendChild(userList);
+
+      // Append the dropdown to the body
+      userContainer.appendChild(dropdown);
+
+      // Add users to the list
+      fetch("/user-search/")
+        .then((response) => response.json())
+        .then((data) => {
+          // Update the dropdown with the fetched data
+          updateDropdown(data.employees);
+        });
+
+      // Close the dropdown when clicking outside of it
+      document.addEventListener("click", function (event) {
+        if (
+          !dropdown.contains(event.target) &&
+          event.target !== userInput
+        ) {
+          dropdown.remove();
+        }
+      });
+    });
+
+    function updateDropdown(users) {
+      let userList = document.querySelector(".user-list");
+      userList.innerHTML = ""; // Clear existing options
+
+      // Create and append user options to the list
+      users.forEach(function (user) {
+        let listItem = document.createElement("li");
+        listItem.className = "searchFieldDropdownItem";
+        listItem.textContent = user.username;
+
+        // Handle user selection
+        listItem.addEventListener("click", function () {
+          userInput.value = user.username;
+          dropdown.remove();
+        });
+
+        userList.appendChild(listItem);
+      });
+    }
+  });
+</script>
+
 {% endblock content %}

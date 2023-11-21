@@ -76,20 +76,20 @@
                   <div class="form-group">
                     <label for="role">User type</label>
                     <select name="role" class="form-control" id="id_role">
-                      <option disabled selected></option>
+                      <option disabled></option>
                       {% if user.role == "Super Admin" %}
-                      <option value="Admin">Admin</option>
-                      <option value="Team Leader" >
+                      <option value="Admin" {% if form.role.value == "Admin" %} selected {% endif %}>Admin</option>
+                      <option value="Team Leader" {% if form.role.value == "Team Leader" %} selected {% endif %}>
                         Team Leader
                       </option>
-                      <option value="Employee">Employee</option>
+                      <option value="Employee" {% if form.role.value == "Employee" %} selected {% endif %}>Employee</option>
                       {% elif user.role == "Admin" %}
-                      <option value="Team Leader" selected="">
+                      <option value="Team Leader" {% if form.role.value == "Team Leader" %} selected {% endif %}>
                         Team Leader
                       </option>
-                      <option value="Employee">Employee</option>
+                      <option value="Employee" {% if form.role.value == "Employee" %} selected {% endif %}>Employee</option>
                       {% else %}
-                      <option value="Employee">Employee</option>
+                      <option value="Employee" {% if form.role.value == "Employee" %} selected {% endif %}>Employee</option>
                       {% endif %}
                     </select>
                   </div>
@@ -100,9 +100,10 @@
                     <label for="role">Team Leader</label>
                     <input
                       type="text"
-                      name="team_leader"
+                      name="team_leader_username"
                       class="form-control"
                       id="id_team_leader"
+                      value="{{ team_leader_username }}"
                     />
                   </div>
                 </div>
@@ -131,18 +132,11 @@
 
               <div class="form-group mb-4">
                 <img
-                  {%
-                  if
-                  form.image.value
-                  %}
+                  {% if form.image.value %}
                   src="{{ form.image.value.url }}"
-                  {%
-                  else
-                  %}
+                  {% else %}
                   src="{% static 'images/user/u7.jpg' %}"
-                  {%
-                  endif
-                  %}
+                  {% endif %}
                   alt="Profile Pic Preview"
                   class="img-fluid userimage"
                 />
@@ -162,7 +156,9 @@
 </div>
 
 <script>
-  document.getElementById("team_leader").style.display = "none";
+  if (document.getElementById("id_role").value !== "Employee") {
+    document.getElementById("team_leader").style.display = "none";
+  }
 
   // edit birth_date form
   const birth_date_container = document.getElementById("birth_date");
@@ -187,6 +183,17 @@
     } else {
       document.getElementById("team_leader").style.display = "block";
     }
+  });
+
+  let passwordFields = document.querySelectorAll("input[type='password']");
+  console.log(passwordFields);
+  passwordFields.forEach(field => {
+    field.addEventListener('focus', () => {
+      field.type = 'text';
+    });
+    field.addEventListener('blur', () => {
+      field.type = 'password';
+    });
   });
 </script>
 

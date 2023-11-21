@@ -372,7 +372,6 @@
                               checked
                               disabled
                               type="checkbox"
-                              class="form-control"
                             />
                           </th>
                           <th>Product</th>
@@ -387,7 +386,6 @@
                               name="checkbox-{{ forloop.counter }}"
                               id="checkbox-{{ forloop.counter }}"
                               type="checkbox"
-                              class="form-control"
                               onchange="toggleCountInput(this)"
                             />
                           </td>
@@ -402,6 +400,7 @@
                               class="form-control"
                               disabled
                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                              value="1"
                             />
                             <input
                               name="p-{{ forloop.counter }}"

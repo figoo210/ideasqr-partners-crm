@@ -17,7 +17,7 @@
           </div>
 
           <div class="card-body">
-            <form method="post" action="/add-submission">
+            <form method="post">
               {% csrf_token %}
               <div class="row mb-2">
                 <div class="col-lg-4">
@@ -250,7 +250,6 @@
                                 checked
                                 disabled
                                 type="checkbox"
-                                class="form-control"
                               />
                             </th>
                             <th>Product</th>
@@ -265,7 +264,6 @@
                                 name="checkbox-{{ forloop.counter }}"
                                 id="checkbox-{{ forloop.counter }}"
                                 type="checkbox"
-                                class="form-control"
                                 onchange="toggleCountInput(this)"
                                 checked
                               />

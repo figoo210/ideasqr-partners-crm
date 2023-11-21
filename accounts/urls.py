@@ -6,6 +6,7 @@ from .views import (
     EmployeesView,
     ShiftCreateView,
     TeamLeaderSearchView,
+    EmployeeSearchView,
     UpdateEmployeeView,
     UpdateAccountView,
     ProfileView,
@@ -35,4 +36,5 @@ urlpatterns = [
     path(
         "team-leader-search/", TeamLeaderSearchView.as_view(), name="team_leader_search"
     ),
+    path("user-search/", EmployeeSearchView.as_view(), name="user_search"),
 ]

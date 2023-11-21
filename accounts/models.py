@@ -6,7 +6,7 @@ from django.utils import timezone
 
 class CustomUser(AbstractUser, PermissionsMixin):
     id = models.CharField(
-        primary_key=True, max_length=36, default=uuid.uuid4, editable=False
+        primary_key=True, max_length=64, default=uuid.uuid4, editable=False
     )
     is_active = models.BooleanField(default=True)
 
@@ -39,14 +39,14 @@ class CustomUser(AbstractUser, PermissionsMixin):
 def get_all_users(user):
     user_team_leaders = CustomUser.objects.filter(
         is_staff=False, is_superuser=False, team_leader=user
-    ).all()
+    ).order_by("-date_joined").all()
     user_team_leaders_employees = CustomUser.objects.filter(
         is_staff=False, is_superuser=False, team_leader__in=user_team_leaders
-    ).all()
+    ).order_by("-date_joined").all()
     return (
         user_team_leaders | user_team_leaders_employees
         if user.role != "Super Admin"
-        else CustomUser.objects.filter(is_staff=False, is_superuser=False).all()
+        else CustomUser.objects.filter(is_staff=False, is_superuser=False).order_by("-date_joined").all()
     )
 
 
