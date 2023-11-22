@@ -51,11 +51,11 @@
                     class="searchCol bg-light"
                   >
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ forloop.counter }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center name">{{ submission.first_name }} {{ submission.last_name }}</div></td>
+                    <td class="p-0" style="height: 80px;  "><div class="w-100 h-100 d-flex justify-content-center align-items-center name">{{ submission.first_name }} {{ submission.last_name }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center phone">{{ submission.phone }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.user_queue.user.team_leader }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.birth_date }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.address }}</div></td>
+                    <td class="p-0" style="height: 80px; max-width: 300px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center descLengthDiv">{{ submission.address }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.city }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">
                       {% if user.role == "Super Admin" or user.role == "Admin" or user.role == "Team Leader" %}
@@ -219,5 +219,17 @@
     }
   });
 
+  // Get the div element
+  const descLengthDivs = document.getElementsByClassName('descLengthDiv');
+
+  for (let i = 0; i < descLengthDivs.length; i++) {
+    let descLengthDiv = descLengthDivs[i];
+    // Check if div content is one word and longer than 100 characters
+    if (descLengthDiv.textContent.trim().length > 100) {
+      const originalContent = descLengthDiv.textContent.trim(); // Store original content
+      descLengthDiv.textContent = originalContent.substring(0, 100) + '...';
+      descLengthDiv.setAttribute('title', originalContent); // Set full content as tooltip
+    }
+  }
 </script>
 {% endblock content %}

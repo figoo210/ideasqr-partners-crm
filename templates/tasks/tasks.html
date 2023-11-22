@@ -42,8 +42,8 @@
                     <tr>
                       <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ forloop.counter }}</div></td>
                       <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.due_date }}</div></td>
-                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.name }}</div></td>
-                      <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.description }}</div></td>
+                      <td class="p-0" style="height: 80px; max-width: 150px; text-align: center;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ task.name }}</div></td>
+                      <td class="p-0" style="height: 80px; max-width: 300px; text-align: center;"><div class="w-100 h-100 d-flex justify-content-center align-items-center descLengthDiv">{{ task.description }}</div></td>
                       <td class="p-0" style="height: 80px;">
                         <div class="w-100 h-100 d-flex justify-content-center align-items-center">
                           {% if task.to_user == user %}From: {{ task.from_user }}{% else %}To: {{ task.to_user }}{% endif %}
@@ -117,6 +117,19 @@
         window.location.href = url;
       }
     });
+  }
+
+  // Get the div element
+  const descLengthDivs = document.getElementsByClassName('descLengthDiv');
+
+  for (let i = 0; i < descLengthDivs.length; i++) {
+    let descLengthDiv = descLengthDivs[i];
+    // Check if div content is one word and longer than 100 characters
+    if (descLengthDiv.textContent.trim().length > 100) {
+      const originalContent = descLengthDiv.textContent.trim(); // Store original content
+      descLengthDiv.textContent = originalContent.substring(0, 100) + '...';
+      descLengthDiv.setAttribute('title', originalContent); // Set full content as tooltip
+    }
   }
 
 </script>

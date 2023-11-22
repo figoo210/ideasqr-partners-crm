@@ -33,6 +33,12 @@ class TaskUpdateView(LoginRequiredMixin, RoleBasedPermissionMixin, UpdateView):
     template_name = "tasks/add_task.html"
     success_url = "/tasks"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["username"] = Task.objects.get(pk=self.kwargs["pk"]).to_user.username
+        return context
+
+
 
 def update_task_state(request, *args, **kwargs):
     task = Task.objects.get(pk=kwargs.get("id"))

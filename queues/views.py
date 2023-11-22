@@ -3,6 +3,7 @@ from django.views.generic import CreateView, UpdateView, ListView
 from django.urls import reverse_lazy
 from django.db.models import OuterRef, Subquery
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 from accounts.models import CustomUser, get_all_users
 from crm_lead_core.custom_views import RoleBasedPermissionMixin, role_required
@@ -34,8 +35,6 @@ class QueueListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["users"] = get_all_users(self.request.user)
-        context["queues"] = Queue.objects.all()
 
         # Subquery to get the latest created_at for each queue
         latest_created_subquery = (
@@ -47,6 +46,17 @@ class QueueListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
         latest_records = UserQueue.objects.filter(
             created_at=Subquery(latest_created_subquery)
         )
+
+        all_data = Queue.objects.all()
+        paginator = Paginator(all_data, per_page=100)
+        page_number = (
+            int(self.request.GET.get("page")) if "page" in self.request.GET else 1
+        )
+        page_obj = paginator.get_page(page_number)
+
+        context["page_obj"] = page_obj
+        context["users"] = get_all_users(self.request.user)
+        context["queues"] = page_obj
         context["queues_users"] = latest_records
 
         return context
@@ -60,23 +70,27 @@ def delete_queue(request, queue_id):
 
 
 @role_required(["Super Admin", "Admin", "Team Leader"])
-def update_queue_user(request, queue_id, user_id):
-    queue = Queue.objects.get(pk=queue_id)
-    user = CustomUser.objects.get(pk=user_id)
-    new_user_queue = UserQueue(
-        user=user,
-        queue=queue,
-    )
-    new_user_queue.save()
+def update_queue_user(request):
+    if request.method == "POST":
+        user = CustomUser.objects.filter(username=request.POST["username"]).first()
+        queue = Queue.objects.get(pk=request.POST["queue_id"])
+        if user:
+            new_user_queue = UserQueue(
+                user=user,
+                queue=queue,
+            )
+            new_user_queue.save()
+
     return redirect("/queues")
 
 
 @role_required(["Super Admin", "Admin", "Team Leader"])
 def update_queue_website(request):
     if request.method == "POST":
-        website = request.POST["website"]
-        user_queue = request.POST["user_queue"]
-        uq = UserQueue.objects.get(pk=int(user_queue))
-        uq.website = website
-        uq.save()
+        if "website" in request.POST and request.POST["website"]:
+            website = request.POST["website"]
+            user_queue = request.POST["user_queue"]
+            uq = UserQueue.objects.get(pk=int(user_queue))
+            uq.website = website
+            uq.save()
     return redirect("/queues")

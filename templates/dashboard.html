@@ -179,11 +179,11 @@
         <div class="card card-default">
           <div class="card-header">
             <h2>Employees Submissions</h2>
-            <span>Realtime</span>
+            <span class="refreshTable" id="refreshTable"><div class="customLoader"></div></span>
           </div>
           <div class="card-body">
             {% comment %} <div id="barchartlg2"></div> {% endcomment %}
-            <div id="chartTable"></div>
+            <div id="chartTable"><div class="customLoader"></div></div>
           </div>
           <div class="card-footer bg-white py-4">
             {% comment %} <a href="#" class="text-uppercase">Current Users Overview</a> {% endcomment %}
@@ -216,5 +216,6 @@
 <input type="text" id="DASHBOARD_WEBSOCKET_URL" value="{{ DASHBOARD_WEBSOCKET_URL }}" hidden>
 <input type="text" id="REALTIME_WEBSOCKET_URL" value="{{ REALTIME_WEBSOCKET_URL }}" hidden>
 <script type="module" src="{% static 'js/dashboard_websocket.js' %}"></script>
+<script type="module" src="{% static 'js/dashboard_websocket_table.js' %}"></script>
 
 {% endblock content %}

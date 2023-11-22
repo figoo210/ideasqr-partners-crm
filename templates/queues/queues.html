@@ -45,60 +45,70 @@
                   <td class="py-0">{{ forloop.counter }}</td>
                   <td>{{ q.name }}</td>
                   <td>
-                    <form method="post" action="/update-queue-website" class="input-group w-75">
-                        {% csrf_token %}
-                        <input
-                            type="text"
-                            class="form-control"
-                            placeholder="Website"
-                            aria-label="Website"
-                            aria-describedby="btn-{{ forloop.counter }}"
-                            required
-                            id="websiteField-{{ forloop.counter }}"
-                            name="website"
-                            {% for uq in queues_users %}
-                                {% if uq.queue.id == q.id %}
-                                    value="{{ uq.website }}"
-                                {% endif %}
-                            {% endfor %}
-                        />
-                        <input
-                            type="text"
-                            name="user_queue"
-                            {% for uq in queues_users %}
-                                {% if uq.queue.id == q.id %}
-                                    value="{{ uq.id }}"
-                                {% endif %}
-                            {% endfor %}
-                            hidden
-                        />
+                    <div class="form-group">
+                      <form method="post" action="/update-queue-website" class="input-group w-75">
+                          {% csrf_token %}
+                          <input
+                              type="text"
+                              class="form-control"
+                              placeholder="Website"
+                              aria-label="Website"
+                              aria-describedby="btn-{{ forloop.counter }}"
+                              required
+                              id="websiteField-{{ forloop.counter }}"
+                              name="website"
+                              {% for uq in queues_users %}
+                                  {% if uq.queue.id == q.id %}
+                                      value="{{ uq.website }}"
+                                  {% endif %}
+                              {% endfor %}
+                          />
+                          <input
+                              type="text"
+                              name="user_queue"
+                              {% for uq in queues_users %}
+                                  {% if uq.queue.id == q.id %}
+                                      value="{{ uq.id }}"
+                                  {% endif %}
+                              {% endfor %}
+                              hidden
+                          />
 
-                        <div class="input-group-append">
-                          <button type="submit" class="btn btn-dark" id="btn-{{ forloop.counter }}">Save</button>
-                        </div>
-                    </form>
+                          <div class="input-group-append">
+                            <button type="submit" class="btn btn-dark" id="btn-{{ forloop.counter }}">Save</button>
+                          </div>
+                      </form>
+                    </div>
                   </td>
                   <td>
-                    <select class="form-control" id="queueUser-{{ forloop.counter }}">
-                      <option></option>
+                    <form method="post" action="/update-queue-user" class="input-group w-75">
+                      {% csrf_token %}
+                      <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Username"
+                          aria-label="Username"
+                          aria-describedby="btn2-{{ forloop.counter }}"
+                          required
+                          id="usernameField-{{ forloop.counter }}"
+                          name="username"
+                          {% for uq in queues_users %}
+                              {% if uq.queue.id == q.id %}
+                                  value="{{ uq.user.username }}"
+                              {% endif %}
+                          {% endfor %}
+                      />
+                      <input
+                          type="text"
+                          name="queue_id"
+                          value="{{ q.id }}"
+                          hidden
+                      />
 
-                      {% for u in users %}
-                        <option
-                            value="{{ u.id }}"
-                            data-url="/queues/assign/{{q.id}}/{{u.id}}"
-
-                            {% for uq in queues_users %}
-                                {% if uq.user.id == u.id and uq.queue.id == q.id %}
-                                  selected
-                                {% endif %}
-                            {% endfor %}
-
-                        >
-                            {{u.username}}
-                        </option>
-                      {% endfor %}
-
-                    </select>
+                      <div class="input-group-append">
+                        <button type="submit" class="btn btn-secondary" id="btn2-{{ forloop.counter }}">update</button>
+                      </div>
+                    </form>
                   </td>
                   <td>
                     {% if user.role == "Super Admin" or user.role == "Admin" %}
@@ -115,6 +125,30 @@
               </tbody>
             </table>
           </div>
+
+          <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+            {% endif %}
+
+            <!-- Loop through page numbers -->
+            {% for i in page_obj.paginator.page_range %}
+                {% if page_obj.number == i %}
+                    <span class="current">{{ i }}</span>
+                {% else %}
+                  {% if i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                    <a href="?page={{ i }}">{{ i }}</a>
+                  {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+            {% endif %}
+          </div>
+
         </div>
       </div>
     </div>
@@ -122,30 +156,89 @@
 </div>
 
 
+
+<!-- Search Field -->
 <script>
-    const queuesUser = document.querySelectorAll('[id^="queueUser-"]');
-    for (let q = 0; q < queuesUser.length; q++) {
-        let queueUser = queuesUser[q];
-        queueUser.addEventListener('change', function() {
-          const selectedOption = this.options[this.selectedIndex];
-          if (selectedOption.value && selectedOption.getAttribute('data-url')) {
-            const url = selectedOption.getAttribute('data-url');
-            window.location.href = url;
-          }
+  document.addEventListener("DOMContentLoaded", function () {
+    const usernameFields = document.querySelectorAll('[id^="usernameField-"]');
+    for (let i = 0; i < usernameFields.length; i++) {
+      let userInput = usernameFields[i];
+      let userContainer = userInput.parentElement.parentElement;
+      let dropdown;
+
+      userInput.addEventListener("focus", function () {
+        // Simulate fetching user data (replace this with your actual endpoint)
+        let userData = "";
+
+        // Create a dropdown element
+        dropdown = document.createElement("div");
+        dropdown.className =
+          "dropdown d-block position-absolute bg-dark w-25 text-light p-1";
+        dropdown.style.zIndex = 10000;
+        userInput.placeholder = "Search for an employee";
+
+        userInput.addEventListener("input", function () {
+          let searchTerm = userInput.value.toLowerCase();
+
+          // Make an AJAX request to the Django view
+          fetch("/user-search/?search_term=" + searchTerm)
+            .then((response) => response.json())
+            .then((data) => {
+              // Update the dropdown with the fetched data
+              updateDropdown(data.employees);
+            });
         });
 
-    }
+        // Create a list to display user options
+        let userList = document.createElement("ul");
+        userList.className = "user-list";
 
-    const websiteFields = document.querySelectorAll('[id^="websiteField-"]');
-    for (let w = 0; w < websiteFields.length; w++) {
-        let websiteField = websiteFields[w];
-        let queueUser = document.getElementById(`queueUser-${parseInt(w) + 1}`);
-        if (!queueUser || queueUser.value === "") {
-            websiteField.disabled = true;
-        } else {
-            websiteField.disabled = false;
-        }
-    }
+        // Append elements to the dropdown
+        dropdown.appendChild(userList);
 
-  </script>
+        // Append the dropdown to the body
+        userContainer.appendChild(dropdown);
+
+        // Add users to the list
+        fetch("/user-search/")
+          .then((response) => response.json())
+          .then((data) => {
+            // Update the dropdown with the fetched data
+            updateDropdown(data.employees);
+          });
+
+        // Close the dropdown when clicking outside of it
+        document.addEventListener("click", function (event) {
+          if (
+            !dropdown.contains(event.target) &&
+            event.target !== userInput
+          ) {
+            dropdown.remove();
+          }
+        });
+      });
+
+      function updateDropdown(users) {
+        let userList = document.querySelector(".user-list");
+        userList.innerHTML = ""; // Clear existing options
+
+        // Create and append user options to the list
+        users.forEach(function (user) {
+          let listItem = document.createElement("li");
+          listItem.className = "searchFieldDropdownItem";
+          listItem.textContent = user.username;
+
+          // Handle user selection
+          listItem.addEventListener("click", function () {
+            userInput.value = user.username;
+            dropdown.remove();
+          });
+
+          userList.appendChild(listItem);
+        });
+      }
+    }
+  });
+</script>
+
 {% endblock content %}

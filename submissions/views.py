@@ -109,7 +109,7 @@ class AddSubmissionView(LoginRequiredMixin, RoleBasedPermissionMixin, CreateView
                 key for key in data if fnmatch.fnmatch(key, wildcard_checkbox)
             ]
             for k in matching_keys:
-                product = Product.objects.get(pk=data[f"count-{k.split('-')[1]}"])
+                product = Product.objects.get(pk=k.split("-")[1])
                 new_submission_product = SubmissionProducts(
                     count=int(data[f"count-{k.split('-')[1]}"])
                     if f"count-{k.split('-')[1]}" in data
