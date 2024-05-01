@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from django.views.generic import CreateView, UpdateView, ListView
 from django.urls import reverse_lazy
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Subquery, Q
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 
@@ -35,6 +35,7 @@ class QueueListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        search_query = self.request.GET.get("query")
 
         # Subquery to get the latest created_at for each queue
         latest_created_subquery = (
@@ -48,6 +49,10 @@ class QueueListView(LoginRequiredMixin, RoleBasedPermissionMixin, ListView):
         )
 
         all_data = Queue.objects.all()
+
+        if search_query:
+            all_data = all_data.filter(Q(name__icontains=search_query))
+
         paginator = Paginator(all_data, per_page=100)
         page_number = (
             int(self.request.GET.get("page")) if "page" in self.request.GET else 1

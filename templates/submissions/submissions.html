@@ -9,6 +9,14 @@
       </div>
       <div class="col-sm-4 text-right">
         <a
+          class="btn btn-secondary btn-pill"
+          href="#"
+          role="button"
+          onclick="exportToCsv()"
+        >
+          Export
+        </a>
+        <a
           class="btn btn-primary btn-pill"
           href="/add-submission"
           role="button"
@@ -43,12 +51,8 @@
 
                 {% for submission in submissions %}
                   <tr
-                    style="cursor: pointer;"
-                    data-toggle="collapse"
-                    data-target="#accordion-row-{{ forloop.counter }}"
-                    aria-expanded="false"
-                    aria-controls="accordion-row-{{ forloop.counter }}"
                     class="searchCol bg-light"
+                    id="tableData"
                   >
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ forloop.counter }}</div></td>
                     <td class="p-0" style="height: 80px;  "><div class="w-100 h-100 d-flex justify-content-center align-items-center name">{{ submission.first_name }} {{ submission.last_name }}</div></td>
@@ -67,7 +71,7 @@
                             value="{{ s.name }}"
                             data-url="/supmissions/status/{{submission.id}}/{{s.name}}"
 
-                            {% if submission.status.name == s.name %}
+                            {% if submission.leader_status.name == s.name %}
                               selected
                             {% endif %}
                           >
@@ -77,13 +81,23 @@
 
                       </select>
                       {% else %}
-                      {{ submission.status.name }}
+                      {{ submission.leader_status.name }}
                       {% endif %}
                     </div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">
                       {% if user.role == "Super Admin" or user.role == "Admin" or user.role == "Team Leader" %}
                       <a href="/submissions/{{ submission.id }}/update" class="btn btn-warning iconbtn"
                         ><i class="mdi mdi-account-edit"></i
+                      ></a>
+                      <a
+                        href="#"
+                        class="btn btn-primary iconbtn ml-1"
+                        data-toggle="collapse"
+                        data-target="#accordion-row-{{ forloop.counter }}"
+                        aria-expanded="false"
+                        aria-controls="accordion-row-{{ forloop.counter }}"
+                      >
+                        <i class="mdi mdi-unfold-more-horizontal"></i
                       ></a>
                       {% comment %} <a href="#" class="btn btn-danger iconbtn" {% endcomment %}
                         {% comment %} ><i class="mdi mdi-delete"></i {% endcomment %}
@@ -94,7 +108,7 @@
                   </tr>
                   <tr>
                     <td colspan="9" class="p-0">
-                      <div id="accordion-row-{{ forloop.counter }}" class="collapse p-5 row">
+                      <div id="accordion-row-{{ forloop.counter }}" class="collapse p-2 row">
                         <form action="/supmissions/comment/update" method="post" class="form-group col-6">
                           {% csrf_token %}
                           <label for="comment"> Comment</label
@@ -103,13 +117,13 @@
                             name="comment"
                             id="comment-{{ forloop.counter }}"
                             required
-                            rows="3"
+                            rows="2"
                             class="form-control"
                             placeholder="Commnet"
                           >{{ submission.comment }}</textarea>
                           <input type="text" hidden value="{{ submission.id }}" name="submission_id">
                           <button
-                            class="btn btn-dark mt-3"
+                            class="btn btn-dark mt-2"
                             type="submit"
                           >
                             Update Comment
@@ -133,13 +147,13 @@
                             name="feedback"
                             id="feedback-{{ forloop.counter }}"
                             required
-                            rows="3"
+                            rows="2"
                             class="form-control"
                             placeholder="Feedback"
                           ></textarea>
                           <input type="text" hidden value="{{ submission.id }}" name="submission_id">
                           <button
-                            class="btn btn-dark mt-3"
+                            class="btn btn-dark mt-2"
                             type="submit"
                           >
                             Add Fedback
@@ -197,26 +211,13 @@
   }
 
   const searchInput = document.getElementById("search-input");
+  const searchForm = document.getElementById("search-form");
   searchInput.disabled = false;
-  searchInput.placeholder = "Search by Name or Phone ..."
+  searchInput.placeholder = "Search by Name or Phone ...";
+
   searchInput.addEventListener("input", event => {
-    let searchValue = event.target.value;
-    let rows = document.getElementsByClassName("searchCol")
-    for (let sn = 0; sn < rows.length; sn++) {
-      const row = rows[sn];
-      const rowNameValue = rows[sn].querySelector(".name").textContent;
-      const rowPhoneValue = rows[sn].querySelector(".phone").textContent;
-      console.log(rowNameValue);
-      console.log(rowPhoneValue);
-      if (searchValue && searchValue.trim().length > 0 &&
-        !rowNameValue.toLowerCase().includes(searchValue.toLowerCase()) &&
-        !rowPhoneValue.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        row.className = "searchCol d-none";
-      } else {
-        row.className = "searchCol";
-      }
-    }
+    let searchValue = event.target.value.trim().toLowerCase();
+    searchForm.setAttribute("action", `/submissions?q=${searchValue}`)
   });
 
   // Get the div element

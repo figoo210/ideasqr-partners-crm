@@ -7,19 +7,34 @@ class Status(TimestampedModel):
     name = models.CharField(primary_key=True, max_length=100)
 
 
+class LeaderStatus(TimestampedModel):
+    name = models.CharField(primary_key=True, max_length=100)
+
+
+class Closers(TimestampedModel):
+    name = models.CharField(primary_key=True, max_length=100)
+
+
 class Submission(TimestampedModel, CreatedByMixin):
     medical_id = models.CharField(max_length=11)
+    pos_type = models.CharField(max_length=4)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     middle_initial = models.CharField(max_length=20, null=True, blank=True)
     phone = models.CharField(max_length=10)
+    phone2 = models.CharField(max_length=10)
     birth_date = models.DateField(auto_now=False, auto_now_add=False)
     address = models.TextField()
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     zip_code = models.CharField(max_length=10)
+    insurance_type = models.CharField(max_length=50, null=True)
     comment = models.TextField(null=True, blank=True)
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True)
+    leader_status = models.ForeignKey(
+        LeaderStatus, on_delete=models.SET_NULL, null=True
+    )
+    closer = models.ForeignKey(Closers, on_delete=models.SET_NULL, null=True)
     user_queue = models.ForeignKey(
         "queues.UserQueue",
         on_delete=models.SET_NULL,

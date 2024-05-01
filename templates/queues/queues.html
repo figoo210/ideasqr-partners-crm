@@ -41,9 +41,9 @@
               </thead>
               <tbody>
                 {% for q in queues %}
-                <tr>
+                <tr class="searchCol bg-light">
                   <td class="py-0">{{ forloop.counter }}</td>
-                  <td>{{ q.name }}</td>
+                  <td class="name">{{ q.name }}</td>
                   <td>
                     <div class="form-group">
                       <form method="post" action="/update-queue-website" class="input-group w-75">
@@ -238,6 +238,15 @@
         });
       }
     }
+
+    const searchInput = document.getElementById("search-input");
+    const searchForm = document.getElementById("search-form");
+    searchInput.disabled = false;
+    searchInput.placeholder = "Search by Queue Name ..."
+    searchInput.addEventListener("input", event => {
+      let searchValue = event.target.value.trim().toLowerCase();
+      searchForm.setAttribute("action", `/queues?q=${searchValue}`)
+    });
   });
 </script>
 

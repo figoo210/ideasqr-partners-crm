@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 from crm_lead_core.custom_views import (
     JsonableResponseMixin,
@@ -118,8 +119,17 @@ class EmployeesView(LoginRequiredMixin, RoleBasedPermissionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        search_query = self.request.GET.get("query")
 
         all_data = get_all_users(self.request.user)
+
+        if search_query:
+            all_data = all_data.filter(
+                Q(first_name__icontains=search_query)
+                | Q(last_name__icontains=search_query)
+                | Q(email__icontains=search_query)
+            )
+
         paginator = Paginator(all_data, per_page=100)
         page_number = (
             int(self.request.GET.get("page")) if "page" in self.request.GET else 1

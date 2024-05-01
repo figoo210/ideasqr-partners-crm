@@ -126,26 +126,12 @@
   };
 
   const searchInput = document.getElementById("search-input");
+  const searchForm = document.getElementById("search-form");
   searchInput.disabled = false;
   searchInput.placeholder = "Search by Name or Email ..."
   searchInput.addEventListener("input", event => {
-    let searchValue = event.target.value;
-    let rows = document.getElementsByClassName("searchCol")
-    for (let sn = 0; sn < rows.length; sn++) {
-      const row = rows[sn];
-      const rowNameValue = rows[sn].querySelector(".name").textContent;
-      const rowEmailValue = rows[sn].querySelector(".email").textContent;
-      console.log(rowNameValue);
-      console.log(rowEmailValue);
-      if (searchValue && searchValue.trim().length > 0 &&
-        !rowNameValue.toLowerCase().includes(searchValue.toLowerCase()) &&
-        !rowEmailValue.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        row.className = "searchCol d-none";
-      } else {
-        row.className = "searchCol";
-      }
-    }
+    let searchValue = event.target.value.trim().toLowerCase();
+    searchForm.setAttribute("action", `/employees?q=${searchValue}`)
   });
 </script>
 {% endblock content %}

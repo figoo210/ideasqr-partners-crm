@@ -10,6 +10,14 @@ from .views import (
     update_submission_comment,
     add_submission_feedback,
     delete_status,
+    LeaderStatusListView,
+    LeaderStatusCreateView,
+    LeaderStatusUpdateView,
+    ClosersCreateView,
+    ClosersListView,
+    ClosersUpdateView,
+    delete_closer,
+    delete_leaderstatus,
 )
 
 urlpatterns = [
@@ -39,4 +47,20 @@ urlpatterns = [
     path("status/create", StatusCreateView.as_view(), name="status_create"),
     path("status/<str:pk>/update", StatusUpdateView.as_view(), name="status_update"),
     path("status/<str:status_name>/delete", delete_status, name="status_delete"),
+    path("leaderstatus/", LeaderStatusListView.as_view(), name="status_list"),
+    path("leaderstatus/create", LeaderStatusCreateView.as_view(), name="status_create"),
+    path(
+        "leaderstatus/<str:pk>/update",
+        LeaderStatusUpdateView.as_view(),
+        name="status_update",
+    ),
+    path(
+        "leaderstatus/<str:status_name>/delete",
+        delete_leaderstatus,
+        name="status_delete",
+    ),
+    path("closers/", ClosersListView.as_view(), name="status_list"),
+    path("closers/create", ClosersCreateView.as_view(), name="status_create"),
+    path("closers/<str:pk>/update", ClosersUpdateView.as_view(), name="status_update"),
+    path("closers/<str:status_name>/delete", delete_closer, name="status_delete"),
 ]

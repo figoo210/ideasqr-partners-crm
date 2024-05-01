@@ -2,7 +2,7 @@ from django import forms
 
 from products.models import Product, SubmissionProducts
 
-from .models import Submission, Status
+from .models import Closers, LeaderStatus, Submission, Status
 
 from datetime import datetime
 import pytz
@@ -20,6 +20,15 @@ class ProductCountForm(forms.ModelForm):
 
 
 class AddSubmissionForm(forms.ModelForm):
+    POS_TYPE_CHOICES = [
+        ("POS2", "POS2"),
+        ("POS4", "POS4"),
+    ]
+    pos_type = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=POS_TYPE_CHOICES,
+    )
+
     class Meta:
         model = Submission
         fields = "__all__"
@@ -45,4 +54,26 @@ class StatusForm(forms.ModelForm):
 
     class Meta:
         model = Status
+        fields = ["name"]
+
+
+class LeaderStatusForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(LeaderStatusForm, self).__init__(*args, **kwargs)
+        self.fields["name"].required = True
+        self.fields["name"].widget.attrs["class"] = "form-control"
+
+    class Meta:
+        model = LeaderStatus
+        fields = ["name"]
+
+
+class CloserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(CloserForm, self).__init__(*args, **kwargs)
+        self.fields["name"].required = True
+        self.fields["name"].widget.attrs["class"] = "form-control"
+
+    class Meta:
+        model = Closers
         fields = ["name"]
