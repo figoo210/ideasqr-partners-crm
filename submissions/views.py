@@ -5,6 +5,8 @@ from django.views.generic import TemplateView, CreateView, UpdateView, ListView
 from django.core.paginator import Paginator
 from django.db.models import Q
 
+import csv
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import datetime
@@ -321,3 +323,75 @@ def delete_closer(request, status_name):
     status = Closers.objects.get(pk=status_name)
     status.delete()
     return redirect("/closers")
+
+
+def export_csv(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        f'attachment; filename="submissions-{datetime.now()}.csv"'
+    )
+
+    writer = csv.writer(response)
+
+    # Query your database and write data to CSV
+    user_team_leaders = CustomUser.objects.filter(team_leader=request.user).all()
+
+    user_team_leaders_employees = CustomUser.objects.none()
+    if user_team_leaders and len(user_team_leaders) > 0:
+        for utl in user_team_leaders:
+            team_leader_employees = CustomUser.objects.filter(team_leader=utl).all()
+            if team_leader_employees and len(team_leader_employees) > 0:
+                user_team_leaders_employees |= team_leader_employees
+    else:
+        user_team_leaders_employees = CustomUser.objects.filter(
+            team_leader=request.user
+        ).all()
+
+    all_data = get_submissions_based_on_role(
+        user=request.user,
+        user_team_leaders=user_team_leaders,
+        user_team_leaders_employees=user_team_leaders_employees,
+    )
+
+    # file header
+    writer.writerow(
+        [
+            "Date",
+            "Status",
+            "Employee",
+            "Patient Name",
+            "Date of Birth",
+            "Med ID",
+            "Address",
+            "City",
+            "State",
+            "Zip Code",
+            "Team Leader",
+        ]
+    )
+    for obj in all_data:
+        writer.writerow(
+            [
+                obj.created_at,
+                obj.leader_status,
+                (
+                    f"{obj.user_queue.user.first_name} {obj.user_queue.user.last_name}"
+                    if obj.user_queue
+                    else ""
+                ),
+                f"{obj.first_name} {obj.middle_initial} {obj.last_name}",
+                obj.birth_date,
+                obj.medical_id,
+                obj.address,
+                obj.city,
+                obj.state,
+                obj.zip_code,
+                (
+                    f"{obj.user_queue.user.team_leader.first_name} {obj.user_queue.user.team_leader.last_name}"
+                    if obj.user_queue and obj.user_queue.user.team_leader
+                    else ""
+                ),
+            ]
+        )  # Adjust fields as per your model
+
+    return response

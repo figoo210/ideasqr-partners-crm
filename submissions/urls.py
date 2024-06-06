@@ -18,6 +18,7 @@ from .views import (
     ClosersUpdateView,
     delete_closer,
     delete_leaderstatus,
+    export_csv,
 )
 
 urlpatterns = [
@@ -63,4 +64,5 @@ urlpatterns = [
     path("closers/create", ClosersCreateView.as_view(), name="status_create"),
     path("closers/<str:pk>/update", ClosersUpdateView.as_view(), name="status_update"),
     path("closers/<str:status_name>/delete", delete_closer, name="status_delete"),
+    path("export-csv/", export_csv, name="export_csv"),
 ]

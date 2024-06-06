@@ -10,9 +10,8 @@
       <div class="col-sm-4 text-right">
         <a
           class="btn btn-secondary btn-pill"
-          href="#"
+          href="{% url 'export_csv' %}"
           role="button"
-          onclick="exportToCsv()"
         >
           Export
         </a>
@@ -37,13 +36,12 @@
               <thead>
                 <tr class="text-center">
                   <th>#</th>
-                  <th>Customer Name</th>
-                  <th>Phone</th>
-                  <th>Team manager</th>
-                  <th>Date of birth</th>
-                  <th>Address</th>
-                  <th>City</th>
-                  <th>Status</th>
+                  <th class="sortCol">Date <i class="bi bi-caret-down-fill"></i></th>
+                  <th class="sortCol">Status <i class="bi bi-caret-down-fill"></i></th>
+                  <th class="sortCol">Employee <i class="bi bi-caret-down-fill"></i></th>
+                  <th class="sortCol">Patient Name <i class="bi bi-caret-down-fill"></i></th>
+                  <th class="sortCol">Date of birth <i class="bi bi-caret-down-fill"></i></th>
+                  <th class="sortCol">Med ID <i class="bi bi-caret-down-fill"></i></th>
                   <th>Edit/Delete</th>
                 </tr>
               </thead>
@@ -51,17 +49,13 @@
 
                 {% for submission in submissions %}
                   <tr
-                    class="searchCol bg-light"
-                    id="tableData"
+                    class="searchCol bg-light dataRow"
+                    id="{{ forloop.counter }}"
                   >
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ forloop.counter }}</div></td>
-                    <td class="p-0" style="height: 80px;  "><div class="w-100 h-100 d-flex justify-content-center align-items-center name">{{ submission.first_name }} {{ submission.last_name }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center phone">{{ submission.phone }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.user_queue.user.team_leader }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.birth_date }}</div></td>
-                    <td class="p-0" style="height: 80px; max-width: 300px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center descLengthDiv">{{ submission.address }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.city }}</div></td>
-                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">
+                    <td class="p-0" style="height: 80px;  "><div class="w-100 h-100 d-flex justify-content-center align-items-center name">{{ submission.created_at }}</div></td>
+                    <td class="p-0" style="height: 80px;">
+                      <div class="w-100 h-100 d-flex justify-content-center align-items-center">
                       {% if user.role == "Super Admin" or user.role == "Admin" or user.role == "Team Leader" %}
                       <select class="form-control" id="submissionsStatus-{{ forloop.counter }}">
                         <option></option>
@@ -83,7 +77,12 @@
                       {% else %}
                       {{ submission.leader_status.name }}
                       {% endif %}
-                    </div></td>
+                      </div>
+                    </td>
+                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.user_queue.user.username }}</div></td>
+                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.first_name }} {{ submission.last_name }}</div></td>
+                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.birth_date }}</div></td>
+                    <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">{{ submission.medical_id }}</div></td>
                     <td class="p-0" style="height: 80px;"><div class="w-100 h-100 d-flex justify-content-center align-items-center">
                       {% if user.role == "Super Admin" or user.role == "Admin" or user.role == "Team Leader" %}
                       <a href="/submissions/{{ submission.id }}/update" class="btn btn-warning iconbtn"
@@ -106,7 +105,8 @@
                     </div>
                     </td>
                   </tr>
-                  <tr>
+                  <!-- Accordion -->
+                  <tr class="additionalData" id="accordion_{{ forloop.counter }}">
                     <td colspan="9" class="p-0">
                       <div id="accordion-row-{{ forloop.counter }}" class="collapse p-2 row">
                         <form action="/supmissions/comment/update" method="post" class="form-group col-6">
@@ -232,5 +232,78 @@
       descLengthDiv.setAttribute('title', originalContent); // Set full content as tooltip
     }
   }
+
+
+  // Export
+
+  function exportToCsv(filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table tr");
+
+    for (var i = 0; i < rows.length; i++) {
+      var row = [], cols = rows[i].querySelectorAll("td, th");
+
+      for (var j = 0; j < cols.length; j++)
+        row.push('"' + cols[j].innerText + '"');
+
+      csv.push(row.join(","));
+    }
+
+    // Download CSV file
+    downloadCsv(csv.join("\n"), `submissions_${new Date().toLocaleDateString()}`);
+  }
+
+  function downloadCsv(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    csvFile = new Blob([csv], {type: "text/csv"});
+    downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+  }
+
+  // Function to toggle sorting arrows
+  function toggleSortArrows(th) {
+    if (th.children[0].classList.contains('bi-caret-down-fill')) {
+      th.children[0].classList = ['bi bi-caret-up-fill']
+    } else {
+      th.children[0].classList = ['bi bi-caret-down-fill']
+    }
+  }
+
+  // Function to sort table
+  function sortTable(columnIndex, asc) {
+    const table = document.getElementById('productsTable');
+    const tbody = table.querySelector('tbody');
+    const additionalData = tbody.querySelectorAll('.additionalData');
+    const rows = Array.from(tbody.querySelectorAll('.dataRow'));
+
+    rows.sort((a, b) => {
+      const aValue = a.children[columnIndex].textContent.trim();
+      const bValue = b.children[columnIndex].textContent.trim();
+      return asc ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    });
+
+    tbody.innerHTML = '';
+    rows.forEach(row => {
+      tbody.appendChild(row);
+      tbody.appendChild(Array.from(additionalData).find(element => element.id === `accordion_${row.id}`));
+    });
+  }
+
+  // Click event handler for table headers
+  const headers = document.querySelectorAll('.sortCol');
+  headers.forEach((header, index) => {
+    header.addEventListener('click', () => {
+      toggleSortArrows(header);
+      const asc = header.children[0].classList.contains('bi-caret-down-fill');
+      sortTable(index + 1, asc);
+    });
+  });
 </script>
 {% endblock content %}
